@@ -34,7 +34,7 @@
 </head>
 <body>
 <h1>Search movie</h1>
-<input type="text" id="searchInput" placeholder="Input name of movie">
+<input type="text" id="searchInput" placeholder="Input movie title or year">
 <button onclick="searchMovies()">Search</button>
 <div id="results"></div>
 
@@ -42,20 +42,30 @@
   function searchMovies() {
     const searchInput = document.getElementById('searchInput');
     const searchTerm = searchInput.value;
-    const yearInput = document.getElementById('yearInput');
-    const year = yearInput.value;
 
     const resultsContainer = document.getElementById('results');
     resultsContainer.innerHTML = '';
 
-    // Створіть URL для запиту GET, додавши параметри title та year.
-    let apiUrl = `/api/movies/search?title=${searchTerm}`;
+    let searchByTitle = true;
+    let searchByYear = true;
 
-    if (year) {
-      apiUrl += `&year=${year}`;
+    if (searchTerm.match(/^\d+$/)) {
+      searchByTitle = false;
+    } else if (!searchTerm) {
+      searchByTitle = false;
+      searchByYear = false;
     }
 
-    // Відправте запит на back-end.
+    let apiUrl = `/api/movies/search?`;
+
+    if (searchByTitle) {
+      apiUrl += `title=${searchTerm}`;
+    }
+
+    if (searchByYear) {
+      apiUrl += `year=${searchTerm}`;
+    }
+
     fetch(apiUrl)
             .then(response => response.json())
             .then(data => {

@@ -11,6 +11,3 @@ public class MoviesSearching {
 		SpringApplication.run(MoviesSearching.class, args);
 	}
 }
-//27:14
-//каже блять курва мать кіт прийшов
-//	а блять то твій кіт
