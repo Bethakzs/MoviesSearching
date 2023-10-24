@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Movies Searching</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+    h1 {
+      text-align: center;
+    }
+    form {
+      text-align: center;
+    }
+    input {
+      padding: 5px;
+    }
+    button {
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    #search-results {
+      text-align: center;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+<h1>Search movie</h1>
+<input type="text" id="searchInput" placeholder="Input name of movie">
+<button onclick="searchMovies()">Search</button>
+<div id="results"></div>
+
+<script>
+  function searchMovies() {
+    const searchInput = document.getElementById('searchInput');
+    const searchTerm = searchInput.value;
+    const yearInput = document.getElementById('yearInput');
+    const year = yearInput.value;
+
+    const resultsContainer = document.getElementById('results');
+    resultsContainer.innerHTML = '';
+
+    // Створіть URL для запиту GET, додавши параметри title та year.
+    let apiUrl = `/api/movies/search?title=${searchTerm}`;
+
+    if (year) {
+      apiUrl += `&year=${year}`;
+    }
+
+    // Відправте запит на back-end.
+    fetch(apiUrl)
+            .then(response => response.json())
+            .then(data => {
+              const movies = data.content;
+
+              if (movies.length > 0) {
+                const ul = document.createElement('ul');
+                movies.forEach(movie => {
+                  const li = document.createElement('li');
+                  li.textContent = `Title: ${movie.title}, Director: ${movie.director}, Release Year: ${movie.releaseYear}`;
+                  ul.appendChild(li);
+                });
+                resultsContainer.appendChild(ul);
+              } else {
+                resultsContainer.textContent = 'Film has not been found';
+              }
+            })
+            .catch(error => {
+              console.error('Request error:', error);
+              resultsContainer.textContent = 'An error has occurred';
+            });
+  }
+</script>
+</body>
+</html>
