@@ -7,6 +7,7 @@
             font-family: Arial, sans-serif;
             text-align: center;
             margin: 20px;
+            background-color: white;
         }
 
         h1 {
@@ -14,57 +15,71 @@
         }
 
         .search-form {
-            margin: 20px;
+            margin: 20px auto;
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 5px;
-            display: inline-block;
-        }
-
-        label {
-            margin-right: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center; /* Додайте цей стиль для вертикального вирівнювання */
+            width: 40%;
         }
 
         input[type="text"] {
             padding: 5px;
             border: 1px solid #ccc;
             border-radius: 3px;
+            width: 70%;
+            height: 30px;
         }
 
         button {
-            padding: 5px 10px;
+            padding: 10px 15px; /* Зменште ширину кнопки */
             background-color: #007BFF;
             color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
+            margin: 0 10px; /* Додайте маржін між кнопками */
         }
 
         .movies-list {
-            margin: 20px;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            display: inline-block;
+            margin-top: 20px;
         }
+
+        .movie-card {
+            background-color: white;
+            margin-bottom: 20px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .all-movies-button, .post-movie-button {
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 20px;
+            margin: 10px;
+        }
+
+        .all-movies-button {
+
+        }
+
     </style>
 </head>
 <body>
 <h1>Movie Search</h1>
-
+<button class="all-movies-button" onclick="redirectToAllMovies()">All Movies</button>
 <div class="search-form">
-    <label for="searchQuery">Search:</label>
     <input type="text" id="searchQuery" name="query" placeholder="Enter movie title or release year">
     <button onclick="searchMovies()">Search</button>
 </div>
 
-<br>
-
-<div class="movies-list">
-    <button onclick="getAllMovies()">All Movies</button>
-</div>
-
-<div id="searchResult"></div>
+<div class="movies-list" id="searchResult"></div>
 
 <script>
     function searchMovies() {
@@ -75,32 +90,41 @@
             .then(response => response.json())
             .then(data => {
                 var searchResult = document.getElementById("searchResult");
-                searchResult.innerHTML = "Search results: ";
+                searchResult.innerHTML = "";
                 data.forEach(movie => {
-                    searchResult.innerHTML += "<br>" + movie.title;
+                    var movieCard = document.createElement("div");
+                    movieCard.className = "movie-card";
+
+                    var movieTitle = document.createElement("h2");
+                    movieTitle.textContent = movie.title;
+
+                    var movieDirector = document.createElement("p");
+                    movieDirector.textContent = "Directed by: " + movie.director;
+
+                    var movieYear = document.createElement("p");
+                    movieYear.textContent = "Year: " + movie.releaseYear;
+
+                    movieCard.appendChild(movieTitle);
+                    movieCard.appendChild(movieDirector);
+                    movieCard.appendChild(movieYear);
+
+                    searchResult.appendChild(movieCard);
                 });
+                if (data.length === 0) {
+                    searchResult.innerHTML = "<p>No movies found</p>";
+                }
             })
             .catch(error => {
                 console.error('Error:', error);
+                var searchResult = document.getElementById("searchResult");
+                searchResult.innerHTML = "<p>Error occurred while fetching movies</p>";
             });
     }
 
-    function getAllMovies() {
-        fetch('/all-movies', {
-            method: 'GET',
-        })
-            .then(response => response.json())
-            .then(data => {
-                var searchResult = document.getElementById("searchResult");
-                searchResult.innerHTML = "All movies: ";
-                data.forEach(movie => {
-                    searchResult.innerHTML += "<br>" + movie.title;
-                });
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
+    function redirectToAllMovies() {
+        window.location.href = '/all-movies';
     }
+
 </script>
 </body>
 </html>

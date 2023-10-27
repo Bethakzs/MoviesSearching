@@ -26,14 +26,21 @@ public class MovieController {
     }
 
     @GetMapping("/all-movies")
-    public ResponseEntity<List<Movie>> getAllMovies(Model model, Pageable pageable) {
+    public String getAllMovies(Model model, Pageable pageable) {
         Page<Movie> moviePage = movieService.getAllMovies(pageable);
-        model.addAttribute("movies", moviePage);
-
-        return ResponseEntity.ok(moviePage.getContent());
+        model.addAttribute("movies", moviePage.getContent());
+        return "all-movies";
     }
 
-    @GetMapping("/search") //сюди пошук
+    @GetMapping("/all-movies-json")
+    @ResponseBody
+    public List<Movie> getAllMoviesJson(Pageable pageable) {
+        Page<Movie> moviePage = movieService.getAllMovies(pageable);
+        return moviePage.getContent();
+    }
+
+    @GetMapping("/search")
+    @ResponseBody
     public ResponseEntity<Page<Movie>> searchMovies(
             @RequestParam(name = "title", required = false) String title,
             @RequestParam(name = "year", required = false) Integer year,

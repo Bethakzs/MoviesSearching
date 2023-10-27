@@ -1,24 +1,91 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Movies List</title>
+    <title>All Movies</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        .movie-card {
+            margin: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            display: inline-block;
+        }
+
+        .movie-image {
+            width: 200px;
+            height: 300px;
+            background-color: #ddd;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 20px;
+        }
+    </style>
 </head>
 <body>
-<h1>Movies List</h1>
-<ul id="movies-list"></ul>
+<h1>All Movies</h1>
+
+<div class="movies-list">
+    <button onclick="getAllMovies()">All Movies</button>
+</div>
+
+<div id="searchResult"></div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-    $(document).ready(function() {
-        $.get("/", function(data) {
-            var movies = data;
-            var moviesList = $("#movies-list");
+    function getAllMovies() {
+        fetch('/all-movies-json', {
+            method: 'GET',
+        })
+            .then(response => response.json())
+            .then(data => {
+                var searchResult = document.getElementById("searchResult");
+                searchResult.innerHTML = "";
+                data.forEach(movie => {
+                    var movieCard = document.createElement("div");
+                    movieCard.className = "movie-card";
 
-            movies.forEach(function(movie) {
-                moviesList.append("<li>" + movie.title + " (" + movie.releaseYear + ") - " + movie.director + "</li>");
+                    var movieImage = document.createElement("div");
+                    movieImage.className = "movie-image";
+                    // TODO: Set the background image of movieImage to the movie's image
+
+                    var movieTitle = document.createElement("h2");
+                    movieTitle.textContent = movie.title;
+
+                    var movieDirector = document.createElement("p");
+                    movieDirector.textContent = "Directed by: " + movie.director;
+
+                    var movieYear = document.createElement("p");
+                    movieYear.textContent = "Year: " + movie.releaseYear;
+
+                    movieCard.appendChild(movieImage);
+                    movieCard.appendChild(movieTitle);
+                    movieCard.appendChild(movieDirector);
+                    movieCard.appendChild(movieYear);
+
+                    searchResult.appendChild(movieCard);
+                });
+            })
+            .catch(error => {
+                console.error('Error:', error);
             });
-        });
-    });
+    }
 </script>
 </body>
 </html>
