@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Movie Search</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        .search-form {
+            margin: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            display: inline-block;
+        }
+
+        label {
+            margin-right: 10px;
+        }
+
+        input[type="text"] {
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+
+        button {
+            padding: 5px 10px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .movies-list {
+            margin: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+<h1>Movie Search</h1>
+
+<div class="search-form">
+    <label for="searchQuery">Search:</label>
+    <input type="text" id="searchQuery" name="query" placeholder="Enter movie title or release year">
+    <button onclick="searchMovies()">Search</button>
+</div>
+
+<br>
+
+<div class="movies-list">
+    <button onclick="getAllMovies()">All Movies</button>
+</div>
+
+<div id="searchResult"></div>
+
+<script>
+    function searchMovies() {
+        var query = document.getElementById("searchQuery").value;
+        fetch('/search?title=' + query, {
+            method: 'GET',
+        })
+            .then(response => response.json())
+            .then(data => {
+                var searchResult = document.getElementById("searchResult");
+                searchResult.innerHTML = "Search results: ";
+                data.forEach(movie => {
+                    searchResult.innerHTML += "<br>" + movie.title;
+                });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
+
+    function getAllMovies() {
+        fetch('/all-movies', {
+            method: 'GET',
+        })
+            .then(response => response.json())
+            .then(data => {
+                var searchResult = document.getElementById("searchResult");
+                searchResult.innerHTML = "All movies: ";
+                data.forEach(movie => {
+                    searchResult.innerHTML += "<br>" + movie.title;
+                });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
+</script>
+</body>
+</html>

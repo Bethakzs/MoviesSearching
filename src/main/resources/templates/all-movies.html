@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Movies List</title>
+</head>
+<body>
+<h1>Movies List</h1>
+<ul id="movies-list"></ul>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $.get("/", function(data) {
+            var movies = data;
+            var moviesList = $("#movies-list");
+
+            movies.forEach(function(movie) {
+                moviesList.append("<li>" + movie.title + " (" + movie.releaseYear + ") - " + movie.director + "</li>");
+            });
+        });
+    });
+</script>
+</body>
+</html>

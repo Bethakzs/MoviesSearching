@@ -22,6 +22,7 @@ public class Movie {
     public Movie() {
 
     }
+
     public Long getId() {
         return id;
     }

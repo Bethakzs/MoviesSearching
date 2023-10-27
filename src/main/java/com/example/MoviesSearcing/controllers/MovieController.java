@@ -6,10 +6,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-@RestController
-@RequestMapping("/api/movies")
+import java.util.List;
+
+@Controller
 public class MovieController {
     private final MovieService movieService;
 
@@ -17,20 +20,20 @@ public class MovieController {
         this.movieService = movieService;
     }
 
-    @PostMapping("/add")
-    public ResponseEntity<Movie> addMovie(@RequestBody Movie movie) {
-        Movie savedMovie = movieService.saveMovie(movie);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedMovie);
+    @GetMapping("/")
+    public String  main() {
+        return "main";
     }
 
     @GetMapping("/all-movies")
-    public ResponseEntity<Page<Movie>> getAllMovies(Pageable pageable) {
-        Page<Movie> resultPage = movieService.getAllMovies(pageable);
+    public ResponseEntity<List<Movie>> getAllMovies(Model model, Pageable pageable) {
+        Page<Movie> moviePage = movieService.getAllMovies(pageable);
+        model.addAttribute("movies", moviePage);
 
-        return resultPage.isEmpty() ? ResponseEntity.notFound().build() : ResponseEntity.ok(resultPage);
+        return ResponseEntity.ok(moviePage.getContent());
     }
 
-    @GetMapping("/search")
+    @GetMapping("/search") //сюди пошук
     public ResponseEntity<Page<Movie>> searchMovies(
             @RequestParam(name = "title", required = false) String title,
             @RequestParam(name = "year", required = false) Integer year,
@@ -51,5 +54,11 @@ public class MovieController {
         }
 
         return resultPage.isEmpty() ? ResponseEntity.notFound().build() : ResponseEntity.ok(resultPage);
+    }
+
+    @PostMapping("/add")
+    public ResponseEntity<Movie> addMovie(@RequestBody Movie movie) {
+        Movie savedMovie = movieService.saveMovie(movie);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedMovie);
     }
 }
