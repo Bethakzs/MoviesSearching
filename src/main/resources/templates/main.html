@@ -24,7 +24,7 @@
             padding: 5px;
             border: 1px solid #ccc;
             border-radius: 3px;
-            width: 60%; /* Зменшено ширину поля пошуку */
+            width: 60%;
             height: 30px;
         }
 
@@ -43,25 +43,61 @@
         }
 
         .movie-card {
-            background-color: white;
-            margin-bottom: 20px;
+            margin: 10px;
             padding: 10px;
+            border: 1px solid #ccc;
             border-radius: 5px;
+            display: flex; /* Зміна на горизонтальний список */
+            width: 800px;
+            height: auto;
+            overflow-wrap: break-word;
+            font-size: 1.3em; /* Збільшення розміру шрифту */
+        }
+
+        .movie-image-container {
+            width :260px; /* Ширина фотографії */
+            height :500px; /* Висота фотографії */
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            background-color:#ddd
+        }
+
+        .movie-text-container {
+            width :calc(100% - 260px); /* Ширина тексту */
+            padding-left :20px; /* Відступ тексту від фотографії */
+            display:flex;
+            flex-direction :column; /* Текст у вигляді стовпця */
+        }
+
+        .movie-image {
+            width :100%;
+            height :100%;
+        }
+
+        .bold {
+            font-weight: bold;
+        }
+
+        .movie-card p {
+            margin: 4px 0;
         }
 
         .all-movies-button {
-            padding: 10px 20px;
-            background-color: #007BFF;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 20px;
-            margin: 10px;
+            padding :10px 20px;
+            background-color :#007BFF;
+            color :white;
+            border :none;
+            border-radius :5px;
+            cursor :pointer;
+            font-size :20px;
+            margin :10px;
         }
     </style>
 </head>
 <body>
+
+
 <h1>Movie Search</h1>
 <button class="all-movies-button" onclick="redirectToAllMovies()">All Movies</button>
 <div class="search-form">
@@ -81,34 +117,23 @@
             .then(data => {
                 var searchResult = document.getElementById("searchResult");
                 searchResult.innerHTML = "";
-                data.forEach(movie => {
-                    var movieCard = document.createElement("div");
-                    movieCard.className = "movie-card";
-
-                    var movieTitle = document.createElement("h2");
-                    movieTitle.textContent = movie.title;
-
-                    var movieDirector = document.createElement("p");
-                    movieDirector.textContent = "Directed by: " + movie.director;
-
-                    var movieYear = document.createElement("p");
-                    movieYear.textContent = "Year: " + movie.releaseYear;
-
-                    var movieDuration = document.createElement("p");
-                    movieDuration.textContent = "Duration: " + movie.duration + " minutes";
-
-                    var movieDescription = document.createElement("p");
-                    movieDescription.textContent = "Description: " + movie.description;
-
-                    movieCard.appendChild(movieTitle);
-                    movieCard.appendChild(movieDirector);
-                    movieCard.appendChild(movieYear);
-                    movieCard.appendChild(movieDuration);
-                    movieCard.appendChild(movieDescription);
-
-                    searchResult.appendChild(movieCard);
+                var exactMatchFound = false;
+                data.content.forEach(movie => {
+                    if (movie.title.toLowerCase() === query.toLowerCase()) {
+                        var movieCard = createMovieCard(movie);
+                        searchResult.appendChild(movieCard);
+                        exactMatchFound = true;
+                    }
                 });
-                if (data.length === 0) {
+                if (!exactMatchFound) {
+                    data.content.forEach(movie => {
+                        if (movie.title.toLowerCase().includes(query.toLowerCase())) {
+                            var movieCard = createMovieCard(movie);
+                            searchResult.appendChild(movieCard);
+                        }
+                    });
+                }
+                if (searchResult.innerHTML === "") {
                     searchResult.innerHTML = "<p>No movies found</p>";
                 }
             })
@@ -117,6 +142,78 @@
                 var searchResult = document.getElementById("searchResult");
                 searchResult.innerHTML = "<p>Error occurred while fetching movies</p>";
             });
+    }
+
+    function createMovieCard(movie) {
+        var movieCard = document.createElement("div");
+        movieCard.className = "movie-card";
+
+        var movieImageContainer = document.createElement("div");
+        movieImageContainer.className = "movie-image-container";
+
+        var movieImage = document.createElement("img");
+        movieImage.src = movie.poster;
+        movieImage.className = "movie-image";
+
+        movieImageContainer.appendChild(movieImage);
+
+        var movieTextContainer = document.createElement("div");
+        movieTextContainer.className = "movie-text-container";
+
+        var movieTitle = document.createElement("h2");
+        movieTitle.textContent = movie.title;
+        movieTextContainer.appendChild(movieTitle);
+
+        var movieDirector = document.createElement("p");
+        movieDirector.innerHTML = "<span class='bold'>Directed by:</span> " + movie.director;
+        movieTextContainer.appendChild(movieDirector);
+
+        var movieYear = document.createElement("p");
+        movieYear.innerHTML = "<span class='bold'>Year:</span> " + movie.releaseYear;
+        movieTextContainer.appendChild(movieYear);
+
+        var movieDuration = document.createElement("p");
+        if (!isNaN(movie.duration)) {
+            movieDuration.innerHTML = "<span class='bold'>Duration:</span> " + movie.duration + " minutes";
+        } else {
+            movieDuration.innerHTML = "<span class='bold'>Duration:</span> " + movie.duration;
+        }
+        movieTextContainer.appendChild(movieDuration);
+
+        var movieGenre = document.createElement("p");
+        movieGenre.innerHTML = "<span class='bold'>Genre:</span> " + movie.genre;
+        movieTextContainer.appendChild(movieGenre);
+
+        var movieRating = document.createElement("p");
+        movieRating.innerHTML = "<span class='bold'>Rating:</span> " + movie.rating;
+        movieTextContainer.appendChild(movieRating);
+
+        var movieDescription = document.createElement("p");
+        movieDescription.innerHTML = "<span class='bold'>Description:</span> " + movie.description;
+        movieTextContainer.appendChild(movieDescription);
+
+        var actorsFormatted = '';
+        [movie.star1, movie.star2, movie.star3, movie.star4]
+            .filter(Boolean)
+            .forEach((actor, index) => {
+                if ((actorsFormatted.length + actor.length) > 30 && index !== 0) {
+                    actorsFormatted += '<br>';
+                }
+                actorsFormatted += actor + ', ';
+            });
+
+        actorsFormatted = actorsFormatted.slice(0, -2);
+
+        var movieActors = document.createElement("p");
+        if (actorsFormatted.length !== 3) {
+            movieActors.innerHTML = "<span class='bold'>Actors:</span> " + actorsFormatted;
+            movieTextContainer.appendChild(movieActors);
+        }
+
+        movieCard.appendChild(movieImageContainer);
+        movieCard.appendChild(movieTextContainer);
+
+        return movieCard;
     }
 
     function redirectToAllMovies() {

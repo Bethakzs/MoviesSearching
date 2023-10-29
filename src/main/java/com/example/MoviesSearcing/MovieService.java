@@ -25,18 +25,17 @@ public class MovieService {
         return movieRepository.findByTitleContainingIgnoreCase(title, pageable);
     }
 
-    public Page<Movie> findByYear(Integer year, Pageable pageable) {
-        return movieRepository.findByReleaseYear(year, pageable);
+    public Page<Movie> findByTitleIgnoreCaseContaining(String title, Pageable pageable) {
+        return movieRepository.findByTitleIgnoreCaseContaining(title, pageable);
     }
 
     public Page<Movie> getAllMovies(Pageable pageable) {
         return movieRepository.findAll(pageable);
     }
+
     public Page<Movie> getAllMoviesSortedByYear(Pageable pageable) {
         PageRequest pageRequest = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by("releaseYear").ascending());
         return movieRepository.findAll(pageRequest);
     }
-    public Page<Movie> findByTitleIgnoreCaseContaining(String title, Pageable pageable) {
-        return movieRepository.findByTitleIgnoreCaseContaining(title, pageable);
-    }
+
 }

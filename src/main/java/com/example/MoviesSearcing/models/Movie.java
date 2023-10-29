@@ -21,7 +21,6 @@ public class Movie {
     private String star1;
     private String star2;
     private String star3;
-
     private String star4;
     private String poster;
 

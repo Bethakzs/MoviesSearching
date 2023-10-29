@@ -42,28 +42,22 @@ public class MovieController {
     @GetMapping("/search")
     @ResponseBody
     public ResponseEntity<Page<Movie>> searchMovies(
-            @RequestParam(name = "title", required = false) String title,
-            @RequestParam(name = "year", required = false) Integer year,
+            @RequestParam(name = "title", required = true) String title,
             Pageable pageable) {
         Page<Movie> resultPage;
 
-        if (title != null) {
-            if (title.startsWith("partial:")) {
-                String partialTitle = title.substring("partial:".length());
-                resultPage = movieService.findByTitleIgnoreCaseContaining(partialTitle, pageable);
-            } else {
-                resultPage = movieService.findByTitle(title, pageable);
-            }
-        } else if (year != null) {
-            resultPage = movieService.findByYear(year, pageable);
+        if (title.startsWith("partial:")) {
+            String partialTitle = title.substring("partial:".length());
+            resultPage = movieService.findByTitleIgnoreCaseContaining(partialTitle, pageable);
         } else {
-            resultPage = movieService.getAllMoviesSortedByYear(pageable);
+            resultPage = movieService.findByTitle(title, pageable);
         }
 
         return resultPage.isEmpty() ? ResponseEntity.notFound().build() : ResponseEntity.ok(resultPage);
     }
 
-    @PostMapping("/add")
+
+    @PostMapping("/add") // in the future
     public ResponseEntity<Movie> addMovie(@RequestBody Movie movie) {
         Movie savedMovie = movieService.saveMovie(movie);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedMovie);

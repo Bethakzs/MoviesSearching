@@ -66,10 +66,27 @@
             font-size: 20px;
             margin: 10px;
         }
+
+        .filters-button {
+            position: absolute;
+            right: 680px;
+            top: 10px;
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 20px;
+            margin: 10px;
+        }
     </style>
 </head>
 <body>
 <button class="return-button" onclick="returnToMainPage()">Return to Main Page</button>
+<button class="filters-button">Filters</button>
+
+
 <h1>All Movies</h1>
 
 <div id="searchResult" class="movies-list"></div>
@@ -105,6 +122,9 @@
         window.location.href = 'http://localhost:8080/';
     }
 
+    function filters() {
+
+    }
 
     function createMovieCard(movie) {
         var movieCard = document.createElement("div");
@@ -163,7 +183,6 @@
 
         var movieActors = document.createElement("p");
         if (actorsFormatted.length !== 3) {
-            // Додайте акторів до карти в кінці
             movieActors.innerHTML = "<span class='bold'>Actors:</span> " + actorsFormatted;
             movieCard.appendChild(movieActors);
         }
