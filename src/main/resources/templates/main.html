@@ -100,21 +100,25 @@
             margin :10px;
         }
     </style>
-
 </head>
 <body>
-
 
 <h1>Movie Search</h1>
 <button class="all-movies-button" onclick="redirectToAllMovies()">All Movies</button>
 <div class="search-form">
-    <input type="text" id="searchQuery" name="query" placeholder="Enter movie title or release year">
+    <input type="text" id="searchQuery" name="query" placeholder="Enter movie title or release year"
+           onkeypress="handleKeyPress(event)">
     <button onclick="searchMovies()">Search</button>
 </div>
 
 <div class="movies-list" id="searchResult"></div>
 
 <script>
+    function handleKeyPress(event) {
+        if (event.key === 'Enter') {
+            searchMovies();
+        }
+    }
     function searchMovies() {
         var query = document.getElementById("searchQuery").value;
         fetch('/search?title=' + query, {

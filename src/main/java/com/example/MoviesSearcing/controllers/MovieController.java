@@ -52,12 +52,11 @@ public class MovieController {
         } else {
             resultPage = movieService.findByTitle(title, pageable);
         }
-
         return resultPage.isEmpty() ? ResponseEntity.notFound().build() : ResponseEntity.ok(resultPage);
     }
 
 
-    @PostMapping("/add") // in the future
+    @PostMapping("/add")
     public ResponseEntity<Movie> addMovie(@RequestBody Movie movie) {
         Movie savedMovie = movieService.saveMovie(movie);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedMovie);
