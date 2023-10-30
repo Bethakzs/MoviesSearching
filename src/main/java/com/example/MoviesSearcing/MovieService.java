@@ -33,9 +33,4 @@ public class MovieService {
         return movieRepository.findAll(pageable);
     }
 
-    public Page<Movie> getAllMoviesSortedByYear(Pageable pageable) {
-        PageRequest pageRequest = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by("releaseYear").ascending());
-        return movieRepository.findAll(pageRequest);
-    }
-
 }

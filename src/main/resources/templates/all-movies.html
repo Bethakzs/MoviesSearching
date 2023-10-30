@@ -20,13 +20,13 @@
         }
 
         .movie-card {
-            margin: 10px;
+            margin: 40px 25px;
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 5px;
             display: flex;
             flex-direction: column;
-            width: 200px;
+            width: calc(15%);
             height: 530px;
             overflow-wrap: break-word;
             font-size: 0.9em;
@@ -36,12 +36,12 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 50%;
+            height: 100%;
         }
 
         .movie-image {
-            width: 60%;
-            height: 80%;
+            width: 90%;
+            height: 100%;
             background-color: #ddd;
         }
 
@@ -93,30 +93,6 @@
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-    function getAllMovies() {
-        var searchResult = document.getElementById("searchResult");
-        searchResult.innerHTML = '';
-
-        fetch('/all-movies-json', {
-            method: 'GET',
-        })
-            .then(response => response.json())
-            .then(data => {
-                var movieIds = new Set();
-                data.forEach(movie => {
-                    if (!movieIds.has(movie.id)) {
-                        var movieCard = createMovieCard(movie);
-                        searchResult.appendChild(movieCard);
-                        movieIds.add(movie.id);
-                    }
-                });
-                inProgress = false;
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                inProgress = false;
-            });
-    }
 
     function returnToMainPage() {
         window.location.href = 'http://localhost:8080/';
@@ -140,52 +116,22 @@
         var movieTitle = document.createElement("h2");
         movieTitle.textContent = movie.title;
 
-        var movieDirector = document.createElement("p");
-        movieDirector.innerHTML = "<span class='bold'>Directed by:</span> " + movie.director;
-
-        var movieYear = document.createElement("p");
-        movieYear.innerHTML = "<span class='bold'>Year:</span> " + movie.releaseYear;
-
-        var movieDuration = document.createElement("p");
-        if (!isNaN(movie.duration)) {
-            movieDuration.innerHTML = "<span class='bold'>Duration:</span> " + movie.duration + " minutes";
-        } else {
-            movieDuration.innerHTML = "<span class='bold'>Duration:</span> " + movie.duration;
-        }
-
         var movieGenre = document.createElement("p");
         movieGenre.innerHTML = "<span class='bold'>Genre:</span> " + movie.genre;
 
         var movieRating = document.createElement("p");
         movieRating.innerHTML = "<span class='bold'>Rating:</span> " + movie.rating;
 
+        var movieReleaseDate = document.createElement("p");
+        movieReleaseDate.innerHTML = "<span class='bold'>Data of release:</span> " + movie.releaseYear;
+
         [movieImage,
             movieTitle,
-            movieDirector,
-            movieYear,
-            movieDuration,
             movieGenre,
-            movieRating].forEach(element => {
+            movieRating,
+            movieReleaseDate,].forEach(element => {
             movieCard.appendChild(element);
         });
-
-        var actorsFormatted = '';
-        [movie.star1, movie.star2, movie.star3, movie.star4]
-            .filter(Boolean)
-            .forEach((actor, index) => {
-                if ((actorsFormatted.length + actor.length) > 30 && index !== 0) {
-                    actorsFormatted += '<br>';
-                }
-                actorsFormatted += actor + ', ';
-            });
-
-        actorsFormatted = actorsFormatted.slice(0, -2);
-
-        var movieActors = document.createElement("p");
-        if (actorsFormatted.length !== 3) {
-            movieActors.innerHTML = "<span class='bold'>Actors:</span> " + actorsFormatted;
-            movieCard.appendChild(movieActors);
-        }
 
         movieImageContainer.appendChild(movieImage);
 
@@ -196,7 +142,7 @@
 
     var page = 0;
     var inProgress = false;
-    var movieIds = new Set();
+    var addedMovieIds = new Set();
 
     $(window).scroll(function() {
         if($(window).scrollTop() + $(window).height() > $(document).height() - 100) {
@@ -209,10 +155,10 @@
                 .then(data => {
                     var searchResult = document.getElementById("searchResult");
                     data.forEach(movie => {
-                        if (!movieIds.has(movie.id)) {
+                        if (!addedMovieIds.has(movie.id)) {
                             var movieCard = createMovieCard(movie);
                             searchResult.appendChild(movieCard);
-                            movieIds.add(movie.id);
+                            addedMovieIds.add(movie.id);
                         }
                     });
                     inProgress = false;
@@ -225,9 +171,10 @@
     });
 
     $(document).ready(function() {
-        getAllMovies();
+        // getAllMovies();
         $(window).scroll();
     });
+
 </script>
 </body>
 </html>
