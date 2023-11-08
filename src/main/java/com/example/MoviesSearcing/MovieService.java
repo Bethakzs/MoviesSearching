@@ -2,7 +2,6 @@ package com.example.MoviesSearcing;
 
 import com.example.MoviesSearcing.models.Movie;
 import com.example.MoviesSearcing.repo.MovieRepository;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -29,8 +28,31 @@ public class MovieService {
         return movieRepository.findByTitleIgnoreCaseContaining(title, pageable);
     }
 
+    public Page<Movie> findByGenre(String genre, Pageable pageable) {
+        return movieRepository.findByGenreContainingIgnoreCase(genre, pageable);
+    }
+
     public Page<Movie> getAllMovies(Pageable pageable) {
         return movieRepository.findAll(pageable);
     }
 
+    public Page<Movie> findByGenreAndReleaseYear(String genre, String releaseYear, Pageable pageable) {
+        return movieRepository.findByGenreContainingIgnoreCaseAndReleaseYearContaining(genre, releaseYear, pageable);
+    }
+
+    public Page<Movie> findByGenreAndReleaseYear(String genre, String year, String sort, Pageable pageable) {
+        if (sort != null) {
+            if (sort.equals("rating_asc")) {
+                pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by("rating").ascending());
+            } else if (sort.equals("rating_desc")) {
+                pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by("rating").descending());
+            }
+        }
+        return movieRepository.findByGenreContainingIgnoreCaseAndReleaseYear(genre, year, pageable);
+    }
+
+
+    public Page<Movie> findByReleaseYear(String releaseYear, Pageable pageable) {
+        return movieRepository.findByReleaseYearContaining(releaseYear, pageable);
+    }
 }

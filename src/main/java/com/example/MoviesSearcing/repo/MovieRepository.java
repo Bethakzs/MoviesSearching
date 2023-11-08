@@ -11,4 +11,12 @@ public interface MovieRepository extends CrudRepository<Movie, Long> {
     Page<Movie> findAll(Pageable pageable);
 
     Page<Movie> findByTitleIgnoreCaseContaining(String title, Pageable pageable);
+
+    Page<Movie> findByGenreContainingIgnoreCase(String genre, Pageable pageable);
+
+    Page<Movie> findByReleaseYearContaining(String releaseYear, Pageable pageable);
+
+    Page<Movie> findByGenreContainingIgnoreCaseAndReleaseYearContaining(String genre, String releaseYear, Pageable pageable);
+
+    Page<Movie> findByGenreContainingIgnoreCaseAndReleaseYear(String genre, String year, Pageable pageable);
 }
