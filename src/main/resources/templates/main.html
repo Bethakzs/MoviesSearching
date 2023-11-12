@@ -124,7 +124,15 @@
         fetch('/search?title=' + query, {
             method: 'GET',
         })
-            .then(response => response.json())
+            // .then(response => response.json())
+            .then(response => {
+                if (response.status === 204) {
+                    var searchResult = document.getElementById("searchResult");
+                    searchResult.innerText = "<p style='font-size: 1.5em; text-align: center;'>Movies haven't found</p>";
+                } else {
+                    return response.json();
+                }
+        })
             .then(data => {
                 var searchResult = document.getElementById("searchResult");
                 searchResult.innerHTML = "";
@@ -154,10 +162,9 @@
             .catch(error => {
                 console.error('Error:', error);
                 var searchResult = document.getElementById("searchResult");
-                searchResult.innerHTML = "<p style='font-size: 1.5em; text-align: center;'>Error occurred while fetching movies</p>";
+                searchResult.status(200).send("<p style='font-size: 1.5em; text-align: center;'>Error occurred while fetching movies</p>");
             });
     }
-
 
     function createMovieCard(movie) {
         var movieCard = document.createElement("div");
@@ -200,8 +207,6 @@
 
         return movieCard;
     }
-
-
 
     function redirectToAllMovies() {
         window.location.href = '/all-movies';

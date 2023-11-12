@@ -101,7 +101,7 @@
             padding: 10px 20px;
             position: absolute;
             right: 859px;
-            top: 650px;
+            top: 630px;
             border: none;
             border-radius: 5px;
             cursor: pointer;
@@ -117,7 +117,7 @@
             left: 0;
             top: 0;
             width: 100%;
-            height: 140%;
+            height: 135%;
             overflow: auto;
             background-color: rgba(0,0,0,0.4);
         }
@@ -149,6 +149,7 @@
         .ratingSort {
             position: fixed;
             left: 842px;
+            top: 545px;
             padding: 10px 20px;
             background-color: #007BFF;
             color: white;
@@ -172,7 +173,6 @@
 <div id="filtersModal" class="modal">
     <div class="modal-content">
         <span class="close">×</span>
-        <p style='font-size: 1.2em; text-align: center;'>Select filters</p>
         <div id="genreFilter">
             <h3>Genre</h3>
             <input type="text" id="genreInput" placeholder="Enter genre" style="width: 200px; height: 30px; border-radius: 10px;">
@@ -182,30 +182,30 @@
             <input type="text" id="yearInput" placeholder="Enter year" style="width: 200px; height: 30px; border-radius: 10px;">
         </div>
         <div id="ratingFilter">
-            <h3>Rating</h3>
             <button id="ratingSort" onclick="toggleSort()" class="ratingSort">Sort by rating</button>
+            <p id="sortMode" style='font-size: 1.2em; font-weight: bold; text-align: center;'>Current mode: None</p>
         </div>
         <button id="use-filter" onclick="applyFilters()">Use Filter</button>
     </div>
 </div>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-
     function returnToMainPage() {
         window.location.href = 'http://localhost:8080/';
     }
 
     var sortRating = 0;
+    var sortModes = ['None', 'Ascending', 'Descending'];
 
     function toggleSort() {
         sortRating = (sortRating + 1) % 3;
+        document.getElementById('sortMode').textContent = 'Current mode: ' + sortModes[sortRating];
     }
 
     function applyFilters() {
         var genre = document.getElementById('genreInput').value;
         var year = document.getElementById('yearInput').value;
-        var url = 'http://localhost:8080/all-movies-filter?';
-        // var url = 'http://localhost:8080/all-movies?'; // Змінено на '/all-movies'
+        var url = 'http://localhost:8080/all-movies-filter-json?';
         if(genre) {
             url += 'genre=' + genre;
         }
@@ -226,14 +226,27 @@
             }
             url += 'sort=rating_desc';
         }
-        window.location.href = url;
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                var searchResult = document.getElementById("searchResult");
+                while (searchResult.firstChild) {
+                    searchResult.removeChild(searchResult.firstChild);
+                }
+                data.forEach(movie => {
+                    var movieCard = createMovieCard(movie);
+                    searchResult.appendChild(movieCard);
+                });
+            });
+        var modal = document.getElementById("filtersModal");
+        modal.style.display = "none";
     }
-
-
 
     function clearFilters() {
         document.getElementById('genreInput').value = '';
         document.getElementById('yearInput').value = '';
+        sortRating = 0;
+        document.getElementById('sortMode').textContent = 'Current mode: ' + sortModes[sortRating];
         var searchResult = document.getElementById("searchResult");
         while (searchResult.firstChild) {
             searchResult.removeChild(searchResult.firstChild);
@@ -242,7 +255,6 @@
         addedMovieIds.clear();
         loadMovies();
     }
-
 
     function filters() {
         var modal = document.getElementById("filtersModal");
@@ -254,59 +266,42 @@
         }
 
         window.onclick = function(event) {
-            if (event.target == modal) {
+            if (event.target === modal) {
                 modal.style.display = "none";
             }
         }
     }
 
-    function createMovieCard(movie) {
-        var movieCard = document.createElement("div");
-        movieCard.className = "movie-card";
-
-        var movieImageContainer = document.createElement("div");
-        movieImageContainer.className = "movie-image-container";
-
-        var movieImage = document.createElement("img");
-        movieImage.src = movie.poster;
-        movieImage.className = "movie-image";
-
-        var movieTitle = document.createElement("h2");
-        movieTitle.textContent = movie.title;
-
-        var movieGenre = document.createElement("p");
-        movieGenre.innerHTML = "<span class='bold'>Genre:</span> " + movie.genre;
-
-        var movieRating = document.createElement("p");
-        movieRating.innerHTML = "<span class='bold'>Rating:</span> " + movie.rating;
-
-        var movieReleaseDate = document.createElement("p");
-        movieReleaseDate.innerHTML = "<span class='bold'>Data of release:</span> " + movie.releaseYear;
-
-        [movieImage,
-            movieTitle,
-            movieGenre,
-            movieRating,
-            movieReleaseDate,].forEach(element => {
-            movieCard.appendChild(element);
+    window.onload = function() {
+        var modal = document.getElementById("filtersModal");
+        modal.addEventListener("keyup", function(event) {
+            if (event.key === "Enter") {
+                applyFilters();
+            }
         });
-
-        movieImageContainer.appendChild(movieImage);
-
-        movieCard.insertBefore(movieImageContainer, movieTitle);
-
-        return movieCard;
     }
 
     var page = 0;
     var inProgress = false;
     var addedMovieIds = new Set();
-    var genre = window.location.search.split('genre=')[1];
 
     function loadMovies() {
         if (inProgress) return;
         inProgress = true;
-        var url = genre ? '/all-movies-filter?genre=' + genre + '&page=' + page++ : '/all-movies-json?page=' + page++;
+        var url = '/all-movies-filter-json?page=' + page++;
+        var genre = document.getElementById('genreInput').value;
+        var year = document.getElementById('yearInput').value;
+        if(genre) {
+            url += '&genre=' + genre;
+        }
+        if(year) {
+            url += '&year=' + year;
+        }
+        if(sortRating === 1) {
+            url += '&sort=rating_asc';
+        } else if(sortRating === 2) {
+            url += '&sort=rating_desc';
+        }
         fetch(url, {
             method: 'GET',
         })
@@ -315,11 +310,9 @@
                 var searchResult = document.getElementById("searchResult");
                 data.forEach(movie => {
                     if (!addedMovieIds.has(movie.id)) {
-                        if (!genre || movie.genres.includes(genre)) {
-                            var movieCard = createMovieCard(movie);
-                            searchResult.appendChild(movieCard);
-                            addedMovieIds.add(movie.id);
-                        }
+                        var movieCard = createMovieCard(movie);
+                        searchResult.appendChild(movieCard);
+                        addedMovieIds.add(movie.id);
                     }
                 });
                 inProgress = false;
@@ -339,6 +332,44 @@
     $(document).ready(function() {
         loadMovies();
     });
-</script>
+
+    function createMovieCard(movie) {
+        var movieCard = document.createElement("div");
+        movieCard.className = "movie-card";
+
+        var movieImageContainer = document.createElement("div");
+        movieImageContainer.className = "movie-image-container";
+
+        var movieImage = document.createElement("img");
+        movieImage.src = movie.poster;
+        movieImage.className = "movie-image";
+
+        var movieTitle = document.createElement("h2");
+        movieTitle.textContent = movie.title;
+
+        var movieGenre = document.createElement("p");
+        movieGenre.innerHTML = "<span class='bold'>Genre:</span> " + movie.genre;
+
+        var movieRating = document.createElement("p");
+        movieRating.innerHTML = "<span class='bold'>Rating:</span> " + movie.rating.toFixed(1);
+
+        var movieReleaseDate = document.createElement("p");
+        movieReleaseDate.innerHTML = "<span class='bold'>Data of release:</span> " + movie.releaseYear;
+
+        [movieImage,
+            movieTitle,
+            movieGenre,
+            movieRating,
+            movieReleaseDate,].forEach(element => {
+            movieCard.appendChild(element);
+        });
+
+        movieImageContainer.appendChild(movieImage);
+
+        movieCard.insertBefore(movieImageContainer, movieTitle);
+
+        return movieCard;
+    }
+    </script>
 </body>
 </html>
