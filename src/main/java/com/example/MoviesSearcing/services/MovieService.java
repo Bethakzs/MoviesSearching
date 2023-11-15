@@ -1,6 +1,7 @@
-package com.example.MoviesSearcing;
+package com.example.MoviesSearcing.services;
 
 import com.example.MoviesSearcing.models.Movie;
+import com.example.MoviesSearcing.models.User;
 import com.example.MoviesSearcing.repo.MovieRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -40,19 +41,8 @@ public class MovieService {
         return movieRepository.findByGenreContainingIgnoreCaseAndReleaseYearContaining(genre, releaseYear, pageable);
     }
 
-    public Page<Movie> findByGenreAndReleaseYear(String genre, String year, String sort, Pageable pageable) {
-        if (sort != null) {
-            if (sort.equals("rating_asc")) {
-                pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by("rating").ascending());
-            } else if (sort.equals("rating_desc")) {
-                pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by("rating").descending());
-            }
-        }
-        return movieRepository.findByGenreContainingIgnoreCaseAndReleaseYear(genre, year, pageable);
-    }
-
-
     public Page<Movie> findByReleaseYear(String releaseYear, Pageable pageable) {
         return movieRepository.findByReleaseYearContaining(releaseYear, pageable);
     }
+
 }
