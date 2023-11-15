@@ -3,6 +3,13 @@
 <head>
     <title>All Movies</title>
     <style>
+        @import url('https://fonts.googleapis.com/css?family=Poppins:400,500,600,700&display=swap');
+        *{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
         body {
             font-family: Arial, sans-serif;
             text-align: center;
@@ -160,6 +167,9 @@
             margin: 10px;
         }
 
+        button:hover{
+            background: #0e4bf1;
+        }
     </style>
 </head>
 <body>
@@ -191,7 +201,7 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     function returnToMainPage() {
-        window.location.href = 'http://localhost:8080/';
+        window.history.back();
     }
 
     var sortRating = 0;

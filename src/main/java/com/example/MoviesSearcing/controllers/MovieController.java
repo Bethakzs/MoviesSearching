@@ -1,6 +1,6 @@
 package com.example.MoviesSearcing.controllers;
 
-import com.example.MoviesSearcing.MovieService;
+import com.example.MoviesSearcing.services.MovieService;
 import com.example.MoviesSearcing.models.Movie;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -68,7 +68,6 @@ public class MovieController {
         return resultPage.getContent();
     }
 
-
     @GetMapping("/all-movies-filter")
     public String filterMoviesPage(
             @RequestParam(name = "genre", required = false) String genre,
@@ -112,12 +111,11 @@ public class MovieController {
         }
         return resultPage.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(resultPage);
     }
-
-    @PostMapping("/add")
-    public ResponseEntity<Movie> addMovie(@RequestBody Movie movie) {
-        Movie savedMovie = movieService.saveMovie(movie);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedMovie);
-    }
+//    @GetMapping("/get-favourites-movies-json")
+//    @ResponseBody
+//    public List<Movie> filterMoviesJson() {
+//        return movieService.getFavouritesMovies();
+//    }
 }
 
 

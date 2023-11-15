@@ -109,11 +109,11 @@
             margin :10px;
         }
 
-        .sign-in-button {
+        .log-out-button {
             position: absolute;
             top: 30px;
-            left: 1650px;
-            width: 150px;
+            left: 1700px;
+            width: 120px;
             height: 50px;
             padding :10px 20px;
             background-color :#007BFF;
@@ -125,12 +125,12 @@
             margin :10px;
         }
 
-        .sign-up-button {
+        .favourites-movies-button {
             position: absolute;
-            top: 100px;
-            left: 1650px;
-            width: 150px;
-            height: 50px;
+            top: 30px;
+            left: 1340px;
+            width: 180px;
+            height: 80px;
             padding :10px 20px;
             background-color :#007BFF;
             color :white;
@@ -150,15 +150,17 @@
 
 <h1>Movie Search</h1>
 <button class="all-movies-button" onclick="redirectToAllMovies()">All Movies</button>
-<button class="sign-in-button" onclick="redirectToSignIn()">Sign In</button>
-<button class="sign-up-button" onclick="redirectToSignUp()">Sign Up</button>
 <div class="search-form">
     <input type="text" id="searchQuery" name="query" placeholder="Enter movie title or release year"
            onkeypress="handleKeyPress(event)">
     <button onclick="searchMovies()">Search</button>
 </div>
+<button class="log-out-button" onclick="redirectToLogOut()">Log Out</button>
+<button class="favourites-movies-button" onclick="redirectToFavouritesMovies()">Favourites Movies</button>
 <div class="movies-list" id="searchResult"></div>
 
+</body>
+</html>
 <script>
     function handleKeyPress(event) {
         if (event.key === 'Enter') {
@@ -166,12 +168,12 @@
         }
     }
 
-    function redirectToSignIn(event) {
-        window.location.href = '/sign-in';
+    function redirectToLogOut(event) {
+        window.location.href = '/';
     }
 
-    function redirectToSignUp(event) {
-        window.location.href = '/sign-up';
+    function redirectToFavouritesMovies(event) {
+        window.location.href = '/get-favourites-movies';
     }
 
     function searchMovies() {
@@ -179,6 +181,7 @@
         fetch('/search?title=' + query, {
             method: 'GET',
         })
+            // .then(response => response.json())
             .then(response => {
                 if (response.status === 204) {
                     var searchResult = document.getElementById("searchResult");
@@ -186,7 +189,7 @@
                 } else {
                     return response.json();
                 }
-        })
+            })
             .then(data => {
                 var searchResult = document.getElementById("searchResult");
                 searchResult.innerHTML = "";
