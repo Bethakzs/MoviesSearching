@@ -90,12 +90,12 @@
             height :100%;
         }
 
-        .bold {
-            font-weight: bold;
-        }
-
         .movie-card p {
             margin: 4px 0;
+        }
+
+        .bold {
+            font-weight: bold;
         }
 
         .all-movies-button {
@@ -143,6 +143,22 @@
 
         button:hover{
             background: #0e4bf1;
+        }
+
+        .check-button {
+            position: absolute;
+            right: 10px;
+            bottom: 10px;
+            width: 50px;
+            height: 50px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 20px;
+            text-align: center;
+            line-height: 30px;
         }
     </style>
 </head>
@@ -223,6 +239,7 @@
     function createMovieCard(movie) {
         var movieCard = document.createElement("div");
         movieCard.className = "movie-card";
+        movieCard.style.position = "relative";
 
         var movieImageContainer = document.createElement("div");
         movieImageContainer.className = "movie-image-container";
@@ -256,8 +273,15 @@
         movieDescription.innerHTML = "<span class='bold'>Description:</span> " + movie.description;
         movieTextContainer.appendChild(movieDescription);
 
+        var checkButton = document.createElement("button");
+        checkButton.innerHTML = "✓";
+        checkButton.className = "check-button";
+        checkButton.addEventListener("click", function() {
+            window.location.href = '/sign-in';
+        });
         movieCard.appendChild(movieImageContainer);
         movieCard.appendChild(movieTextContainer);
+        movieCard.appendChild(checkButton);
 
         return movieCard;
     }

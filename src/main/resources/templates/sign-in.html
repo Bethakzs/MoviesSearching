@@ -148,6 +148,7 @@
                 return response.json();
             })
             .then(data => {
+                sessionStorage.setItem('user', JSON.stringify(email.value));
                 window.location.href = '/mainLoged';
             })
             .catch((error) => {

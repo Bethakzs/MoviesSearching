@@ -3,11 +3,14 @@ package com.example.MoviesSearcing.services;
 import com.example.MoviesSearcing.models.Movie;
 import com.example.MoviesSearcing.models.User;
 import com.example.MoviesSearcing.repo.MovieRepository;
+import com.example.MoviesSearcing.repo.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class MovieService {
@@ -15,10 +18,6 @@ public class MovieService {
 
     public MovieService(MovieRepository movieRepository) {
         this.movieRepository = movieRepository;
-    }
-
-    public Movie saveMovie(Movie movie) {
-        return movieRepository.save(movie);
     }
 
     public Page<Movie> findByTitle(String title, Pageable pageable) {
@@ -44,5 +43,4 @@ public class MovieService {
     public Page<Movie> findByReleaseYear(String releaseYear, Pageable pageable) {
         return movieRepository.findByReleaseYearContaining(releaseYear, pageable);
     }
-
 }

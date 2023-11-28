@@ -34,7 +34,7 @@
             border: 1px solid #ccc;
             border-radius: 3px;
             width: 60%;
-            height: 30px;
+            height: 40px;
         }
 
         button {
@@ -98,6 +98,21 @@
             margin: 4px 0;
         }
 
+        .info {
+            position: absolute;
+            top: 78px;
+            left: 1680px;
+            width: 160px;
+            height: 50px;
+            padding :10px 20px;
+            color :#007BFF;
+            border :none;
+            border-radius :5px;
+            cursor :pointer;
+            font-size :15px;
+            margin :10px;
+        }
+
         .all-movies-button {
             padding :10px 20px;
             background-color :#007BFF;
@@ -127,8 +142,8 @@
 
         .favourites-movies-button {
             position: absolute;
-            top: 30px;
-            left: 1340px;
+            top: 40px;
+            left: 1200px;
             width: 180px;
             height: 80px;
             padding :10px 20px;
@@ -144,6 +159,22 @@
         button:hover{
             background: #0e4bf1;
         }
+
+        .check-button {
+            position: absolute;
+            right: 10px;
+            bottom: 10px;
+            width: 50px;
+            height: 50px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 20px;
+            text-align: center;
+            line-height: 30px;
+        }
     </style>
 </head>
 <body>
@@ -156,6 +187,7 @@
     <button onclick="searchMovies()">Search</button>
 </div>
 <button class="log-out-button" onclick="redirectToLogOut()">Log Out</button>
+<label class="info" >you are logged</label>
 <button class="favourites-movies-button" onclick="redirectToFavouritesMovies()">Favourites Movies</button>
 <div class="movies-list" id="searchResult"></div>
 
@@ -171,9 +203,10 @@
     function redirectToLogOut(event) {
         window.location.href = '/';
     }
-
     function redirectToFavouritesMovies(event) {
-        window.location.href = '/get-favourites-movies';
+        var email = document.getElementById('email');
+        sessionStorage.setItem('email', JSON.stringify(email));
+        window.location.href = '/favourite-movies';
     }
 
     function searchMovies() {
@@ -181,7 +214,6 @@
         fetch('/search?title=' + query, {
             method: 'GET',
         })
-            // .then(response => response.json())
             .then(response => {
                 if (response.status === 204) {
                     var searchResult = document.getElementById("searchResult");
@@ -226,6 +258,7 @@
     function createMovieCard(movie) {
         var movieCard = document.createElement("div");
         movieCard.className = "movie-card";
+        movieCard.style.position = "relative";
 
         var movieImageContainer = document.createElement("div");
         movieImageContainer.className = "movie-image-container";
@@ -259,10 +292,50 @@
         movieDescription.innerHTML = "<span class='bold'>Description:</span> " + movie.description;
         movieTextContainer.appendChild(movieDescription);
 
+        var checkButton = document.createElement("button");
+        checkButton.className = "check-button";
+        checkButton.addEventListener("click", function() {
+            checkButton.innerHTML = "✓";
+            var email = JSON.parse(sessionStorage.getItem('user'));
+            var movie = movieTitle.textContent;
+
+            fetch('/add-favorite-movie', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({
+                    'movie': movie,
+                    'email': email
+                })
+            })
+                .then(response => response.json())
+                .then(data => console.log(data))
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+        });
+
+        if (!isInFavoriteMovies(movie)) {  //СChange after remaking isInFavouriteMovies
+            checkButton.innerHTML = "✓";
+        } else {
+            checkButton.innerHTML = "+";
+        }
+
         movieCard.appendChild(movieImageContainer);
         movieCard.appendChild(movieTextContainer);
+        movieCard.appendChild(checkButton);
 
         return movieCard;
+    }
+
+    function isInFavoriteMovies(email, movie, callback) {
+        fetch(`/favourite-movies-json?email=${email}`)
+            .then(response => response.json())
+            .then(favouriteMovies => {
+                const isInList = favouriteMovies.includes(movie);
+                callback(isInList);
+            });
     }
 
     function redirectToAllMovies() {
