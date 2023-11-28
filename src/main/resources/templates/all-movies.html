@@ -106,16 +106,11 @@
             background-color: #007BFF;
             color: white;
             padding: 10px 20px;
-            position: absolute;
-            right: 859px;
-            top: 630px;
             border: none;
             border-radius: 5px;
             cursor: pointer;
             font-size: 20px;
-            margin: 10px;
         }
-
 
         .modal {
             display: none;
@@ -129,13 +124,15 @@
             background-color: rgba(0,0,0,0.4);
         }
 
-        .modal-content {
+        .modal-body {
             background-color: #fefefe;
             margin: 15% auto;
             padding: 20px;
             border: 1px solid #888;
             width: 20%;
             height: 30%;
+            display: grid;
+            place-items: center;
         }
 
         .close {
@@ -143,7 +140,7 @@
             float: right;
             font-size: 28px;
             font-weight: bold;
-            margin-top: -10px;
+            place-self: end;
         }
 
         .close:hover,
@@ -154,9 +151,6 @@
         }
 
         .ratingSort {
-            position: fixed;
-            left: 842px;
-            top: 545px;
             padding: 10px 20px;
             background-color: #007BFF;
             color: white;
@@ -182,20 +176,26 @@
 <div id="searchResult" class="movies-list"></div>
 <div id="filtersModal" class="modal">
     <div class="modal-content">
-        <span class="close">×</span>
-        <div id="genreFilter">
-            <h3>Genre</h3>
-            <input type="text" id="genreInput" placeholder="Enter genre" style="width: 200px; height: 30px; border-radius: 10px;">
+        <div class="modal-body">
+            <span class="close" >X</span>
+            <div class="modal-filters">
+                <div id="genreFilter">
+                    <h3>Genre</h3>
+                    <input type="text" id="genreInput" placeholder="Enter genre" style="height: 30px; border-radius: 10px;">
+                </div>
+                <div id="yearFilter">
+                    <h3>Year</h3>
+                    <input type="text" id="yearInput" placeholder="Enter year" style="height: 30px; border-radius: 10px;">
+                </div>
+            </div>
+           <div class="modal-buttons" >
+               <div id="ratingFilter">
+                   <button id="ratingSort" onclick="toggleSort()" class="ratingSort">Sort by rating</button>
+                   <p id="sortMode" style='font-size: 1.2em; font-weight: bold; text-align: center;'>Current mode: None</p>
+               </div>
+               <button id="use-filter" onclick="applyFilters()">Use Filter</button>
+           </div>
         </div>
-        <div id="yearFilter">
-            <h3>Year</h3>
-            <input type="text" id="yearInput" placeholder="Enter year" style="width: 200px; height: 30px; border-radius: 10px;">
-        </div>
-        <div id="ratingFilter">
-            <button id="ratingSort" onclick="toggleSort()" class="ratingSort">Sort by rating</button>
-            <p id="sortMode" style='font-size: 1.2em; font-weight: bold; text-align: center;'>Current mode: None</p>
-        </div>
-        <button id="use-filter" onclick="applyFilters()">Use Filter</button>
     </div>
 </div>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

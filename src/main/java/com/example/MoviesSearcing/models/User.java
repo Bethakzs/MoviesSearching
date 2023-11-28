@@ -4,6 +4,10 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import org.springframework.data.domain.Page;
+
+import java.util.Collection;
+import java.util.Collections;
 
 @Entity
 public class User {
@@ -13,17 +17,26 @@ public class User {
     private String username;
     private String email;
     private String password;
+    private String favouriteMovies;
 
-    public User(Long id, String username, String email, String password) {
+    public User(Long id, String username, String email, String password, String favouriteMovies) {
         this.id = id;
         this.username = username;
         this.email = email;
         this.password = password;
+        this.favouriteMovies = favouriteMovies;
     }
+
     public User() {
 
     }
+    public String getFavouriteMovies() {
+        return favouriteMovies;
+    }
 
+    public void setFavouriteMovies(String favouriteMovies) {
+        this.favouriteMovies = favouriteMovies;
+    }
     public Long getId() {
         return id;
     }
@@ -55,4 +68,5 @@ public class User {
     public void setPassword(String password) {
         this.password = password;
     }
+
 }

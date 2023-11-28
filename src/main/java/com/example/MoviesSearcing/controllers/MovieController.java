@@ -1,5 +1,6 @@
 package com.example.MoviesSearcing.controllers;
 
+import com.example.MoviesSearcing.models.User;
 import com.example.MoviesSearcing.services.MovieService;
 import com.example.MoviesSearcing.models.Movie;
 import org.springframework.data.domain.Page;
@@ -78,7 +79,7 @@ public class MovieController {
         if (sort != null) {
             if (sort.equals("rating_asc")) {
                 pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by("rating").ascending());
-            } else if (sort.equals("rating_desc")) {
+            } else if (sort.equals("rating_ desc")) {
                 pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by("rating").descending());
             }
         }
@@ -111,11 +112,6 @@ public class MovieController {
         }
         return resultPage.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(resultPage);
     }
-//    @GetMapping("/get-favourites-movies-json")
-//    @ResponseBody
-//    public List<Movie> filterMoviesJson() {
-//        return movieService.getFavouritesMovies();
-//    }
 }
 
 

@@ -1,0 +1,96 @@
+[33mcommit ba781f946205ae9c9a198e7eb8316f674793c9dc[m[33m ([m[1;36mHEAD -> [m[1;32mmaster[m[33m, [m[1;31morigin/authorization[m[33m, [m[1;32mauthorization[m[33m)[m
+Author: Bethakzs <145256920+Flashb4ekkk@users.noreply.github.com>
+Date:   Wed Nov 15 20:45:58 2023 +0200
+
+    final authorization
+
+[33mcommit 452e4612a7ba9535fe207c8f8a725f2e81cf5d4c[m[33m ([m[1;31morigin/master[m[33m)[m
+Merge: 3478d5b 6ab4df2
+Author: Bethakzs <145256920+Flashb4ekkk@users.noreply.github.com>
+Date:   Sun Nov 12 11:03:14 2023 +0200
+
+    Merge remote-tracking branch 'origin/master'
+
+[33mcommit 6ab4df2380bff384a8f54c672dd31f6034e6547f[m
+Author: Flashb4ekkk <145256920+Flashb4ekkk@users.noreply.github.com>
+Date:   Sun Nov 12 11:01:39 2023 +0200
+
+    Delete index.html
+
+[33mcommit 3478d5b461d9365ef983b9671cf3c1e7a9947727[m
+Author: Bethakzs <145256920+Flashb4ekkk@users.noreply.github.com>
+Date:   Sun Nov 12 11:00:05 2023 +0200
+
+    release 4.0 commit
+
+[33mcommit cff2404ddfae346a67260f77cb06650bf2012839[m
+Author: Bethakzs <145256920+Flashb4ekkk@users.noreply.github.com>
+Date:   Wed Nov 8 12:09:07 2023 +0200
+
+    rework 3.0 commit
+
+[33mcommit aad557d3fa31765b4c7b5e673a06d39b99e7db62[m
+Author: Flashb4ekkk <145256920+Flashb4ekkk@users.noreply.github.com>
+Date:   Tue Oct 31 10:13:52 2023 +0200
+
+    Create README.md
+
+[33mcommit 300e4e08b992d24f4373f5e824cbf6a94a1f857e[m
+Author: Bethakzs <145256920+Flashb4ekkk@users.noreply.github.com>
+Date:   Mon Oct 30 23:00:55 2023 +0200
+
+    try2
+
+[33mcommit 847ccc63fd30747cf66e21fa2ee94e72c492f74c[m
+Author: Bethakzs <145256920+Flashb4ekkk@users.noreply.github.com>
+Date:   Mon Oct 30 22:59:55 2023 +0200
+
+    try1
+
+[33mcommit 11da16b8334e3776b71df95e228634f84ffbff40[m
+Author: Bethakzs <romanwdwd@gmail.com>
+Date:   Mon Oct 30 19:58:52 2023 +0200
+
+    release version commit
+
+[33mcommit 214d810b808594a4218cac5f2591280fdaebd73d[m
+Author: Bethakzs <romanwdwd@gmail.com>
+Date:   Mon Oct 30 02:34:18 2023 +0200
+
+    beta version
+
+[33mcommit f6152621481e3e3d97e8e3021d24a22a04e00afd[m
+Author: Bethakzs <romanwdwd@gmail.com>
+Date:   Sun Oct 29 21:54:43 2023 +0200
+
+    finish commit after new DB
+
+[33mcommit b459b117e9a9ae64914cb2a971ce37f6173fd78f[m
+Author: Bethakzs <romanwdwd@gmail.com>
+Date:   Fri Oct 27 21:35:56 2023 +0300
+
+    release 2.0 commit
+
+[33mcommit 0fdbde970e4d440641598ba2cb5690fed7aba80c[m
+Author: Bethakzs <romanwdwd@gmail.com>
+Date:   Fri Oct 27 14:06:39 2023 +0300
+
+    make all-movies button
+
+[33mcommit 125ba482f7d43b08339916cc36415075cd8092e0[m
+Author: Bethakzs <romanwdwd@gmail.com>
+Date:   Fri Oct 27 11:37:55 2023 +0300
+
+    main page commit
+
+[33mcommit 8456aa4e9eb635e7d28b28352fc4e6258ed9ecf8[m
+Author: Bethakzs <romanwdwd@gmail.com>
+Date:   Tue Oct 24 20:17:18 2023 +0300
+
+    fix bugs 1.0
+
+[33mcommit a886f1a3664846f863f3e6acd8a32eb8d693b210[m
+Author: Bethakzs <romanwdwd@gmail.com>
+Date:   Tue Oct 24 18:37:33 2023 +0300
+
+    init commit

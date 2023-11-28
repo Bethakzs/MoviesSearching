@@ -10,6 +10,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class UserService {
     private final UserRepository userRepository;
@@ -29,4 +31,12 @@ public class UserService {
     public User findByEmail(String email) {
         return userRepository.findByEmail(email);
     }
+
+//    public User getFavouritesMovies(String email) {
+//        return userRepository.findByEmail(email);
+//    }
+
+//    public User saveFavouriteMovie(String email, String title) {
+//        return userRepository.updateUserByEmail(email, title);
+//    }
 }
