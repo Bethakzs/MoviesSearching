@@ -215,7 +215,8 @@
     function applyFilters() {
         var genre = document.getElementById('genreInput').value;
         var year = document.getElementById('yearInput').value;
-        var url = 'http://localhost:8080/all-movies-filter-json?';
+        // var url = 'http://localhost:8080/all-movies-filter-json?';
+        var url = 'https://readily-dynamic-salmon.ngrok-free.app/all-movies-filter-json?';
         if(genre) {
             url += 'genre=' + genre;
         }
