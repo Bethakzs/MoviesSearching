@@ -14,6 +14,4 @@ import java.util.List;
 public interface UserRepository extends CrudRepository<User, Long> {
     Page<User> findAll(Pageable pageable);
     User findByEmail(String email);
-//    User updateUserByEmail(String email, String title);
 }
-

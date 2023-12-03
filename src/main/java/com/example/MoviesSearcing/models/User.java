@@ -4,10 +4,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import org.springframework.data.domain.Page;
-
-import java.util.Collection;
-import java.util.Collections;
 
 @Entity
 public class User {

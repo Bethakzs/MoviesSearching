@@ -215,42 +215,36 @@
     function applyFilters() {
         var genre = document.getElementById('genreInput').value;
         var year = document.getElementById('yearInput').value;
-        var url = 'http://localhost:8080/all-movies-filter-json?';
+        var url = 'https://readily-dynamic-salmon.ngrok-free.app/movies/filter?callback=handleResponse';
         if(genre) {
-            url += 'genre=' + genre;
+            url += '&genre=' + encodeURIComponent(genre);
         }
         if(year) {
-            if(genre) {
-                url += '&';
-            }
-            url += 'year=' + year;
+            url += '&year=' + encodeURIComponent(year);
         }
         if(sortRating === 1) {
-            if(genre || year) {
-                url += '&';
-            }
-            url += 'sort=rating_asc';
+            url += '&sort=rating_asc';
         } else if(sortRating === 2) {
-            if(genre || year) {
-                url += '&';
-            }
-            url += 'sort=rating_desc';
+            url += '&sort=rating_desc';
         }
-        fetch(url)
-            .then(response => response.json())
-            .then(data => {
-                var searchResult = document.getElementById("searchResult");
-                while (searchResult.firstChild) {
-                    searchResult.removeChild(searchResult.firstChild);
-                }
-                data.forEach(movie => {
-                    var movieCard = createMovieCard(movie);
-                    searchResult.appendChild(movieCard);
-                });
-            });
+        var script = document.createElement('script');
+        script.src = url;
+        document.head.appendChild(script);
+    }
+
+    window.handleResponse = function(data) {
+        var searchResult = document.getElementById("searchResult");
+        while (searchResult.firstChild) {
+            searchResult.removeChild(searchResult.firstChild);
+        }
+        data.forEach(movie => {
+            var movieCard = createMovieCard(movie);
+            searchResult.appendChild(movieCard);
+        });
         var modal = document.getElementById("filtersModal");
         modal.style.display = "none";
     }
+
 
     function clearFilters() {
         document.getElementById('genreInput').value = '';
@@ -296,42 +290,24 @@
     var addedMovieIds = new Set();
 
     function loadMovies() {
-        if (inProgress) return;
-        inProgress = true;
-        var url = '/all-movies-filter-json?page=' + page++;
-        var genre = document.getElementById('genreInput').value;
-        var year = document.getElementById('yearInput').value;
-        if(genre) {
-            url += '&genre=' + genre;
-        }
-        if(year) {
-            url += '&year=' + year;
-        }
-        if(sortRating === 1) {
-            url += '&sort=rating_asc';
-        } else if(sortRating === 2) {
-            url += '&sort=rating_desc';
-        }
-        fetch(url, {
-            method: 'GET',
-        })
-            .then(response => response.json())
-            .then(data => {
-                var searchResult = document.getElementById("searchResult");
-                data.forEach(movie => {
-                    if (!addedMovieIds.has(movie.id)) {
-                        var movieCard = createMovieCard(movie);
-                        searchResult.appendChild(movieCard);
-                        addedMovieIds.add(movie.id);
-                    }
-                });
-                inProgress = false;
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                inProgress = false;
-            });
+        var url = 'https://readily-dynamic-salmon.ngrok-free.app/movies/filter?callback=handleResponse';
+        var script = document.createElement('script');
+        script.src = url;
+        document.head.appendChild(script);
     }
+
+    function handleResponse(data) {
+        var searchResult = document.getElementById("searchResult");
+        data.forEach(movie => {
+            if (!addedMovieIds.has(movie.id)) {
+                var movieCard = createMovieCard(movie);
+                searchResult.appendChild(movieCard);
+                addedMovieIds.add(movie.id);
+            }
+        });
+        inProgress = false;
+    }
+
 
     $(window).scroll(function() {
         if($(window).scrollTop() + $(window).height() > $(document).height() - 100) {

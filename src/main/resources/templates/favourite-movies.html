@@ -89,7 +89,7 @@
 
         .return-button {
             position: absolute;
-            left: 550px;
+            left: 520px;
             top: 10px;
             padding: 10px 20px;
             background-color: #007BFF;
@@ -125,37 +125,63 @@
     function loadMovies() {
         if (inProgress) return;
         inProgress = true;
-        var email = JSON.parse(sessionStorage.getItem('user'));
-        var url = '/favourite-movies-json?email=' + encodeURIComponent(email);
+        var user = JSON.parse(sessionStorage.getItem('user'));
+        var email = user.email;
+        var url = 'https://readily-dynamic-salmon.ngrok-free.app/users/' + encodeURIComponent(email) + '/favourite-movies?page=' + page + '&callback=handleMovieTitlesResponse';
+        var script = document.createElement('script');
+        script.src = url;
+        document.head.appendChild(script);
+        page++;
+    }
 
-        fetch(url, {
-            method: 'GET',
-        })
-            .then(response => response.json())
-            .then(movieTitles => {
-                var searchResult = document.getElementById("searchResult");
-                var promises = movieTitles.map(movieTitle => {
-                    movieTitle = movieTitle.trim(); // remove any leading or trailing spaces
-                    if (!addedMovieIds.has(movieTitle)) {
-                        return fetch('/search?title=' + encodeURIComponent(movieTitle))
-                            .then(response => response.json())
-                            .then(moviePage => {
-                                var movie = moviePage.content[0]; // assuming the movie is the first result
-                                var movieCard = createMovieCard(movie);
-                                searchResult.appendChild(movieCard);
-                                addedMovieIds.add(movieTitle);
-                            });
+    window.handleMovieTitlesResponse = function(movieTitles) {
+        var promises = movieTitles.map(movieTitle => {
+            movieTitle = movieTitle.trim();
+            if (!addedMovieIds.has(movieTitle)) {
+                addedMovieIds.add(movieTitle); // Add the movie title to the set of added movies
+                var url = 'https://readily-dynamic-salmon.ngrok-free.app/movies/search?title=' + encodeURIComponent(movieTitle) + '&callback=handleResponse ';
+                var script = document.createElement('script');
+                script.src = url;
+                document.head.appendChild(script);
+            }
+        });
+        Promise.all(promises).then(() => {
+            inProgress = false;
+        });
+    }
+
+    window.handleResponse = function(data) {
+        try {
+            var searchResult = document.getElementById("searchResult");
+            var exactMatchFound = false;
+            var addedMovieTitles = new Set();
+            if (data && Array.isArray(data)) {
+                data.forEach(movie => {
+                    var query = movie.title;
+                    if (movie.title.localeCompare(query, undefined, {sensitivity: 'base'}) === 0 && !addedMovieTitles.has(movie.title)) {
+                        var movieCard = createMovieCard(movie);
+                        searchResult.appendChild(movieCard);
+                        exactMatchFound = true;
+                        addedMovieTitles.add(movie.title);
                     }
                 });
-                return Promise.all(promises);
-            })
-            .then(() => {
-                inProgress = false;
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                inProgress = false;
-            });
+                if (!exactMatchFound) {
+                    data.forEach(movie => {
+                        var query = movie.title;
+                        if (movie.title.toLowerCase().includes(query.toLowerCase()) && !addedMovieTitles.has(movie.title)) {
+                            var movieCard = createMovieCard(movie);
+                            searchResult.appendChild(movieCard);
+                            addedMovieTitles.add(movie.title);
+                        }
+                    });
+                }
+            }
+            if (searchResult.innerHTML === "") {
+                searchResult.innerHTML = "<p style='font-size: 1.5em; text-align: center;'>No movies found</p>";
+            }
+        } catch (error) {
+            console.error("An error occurred while handling the response: ", error);
+        }
     }
 
     $(window).scroll(function() {
@@ -167,6 +193,7 @@
     $(document).ready(function() {
         loadMovies();
     });
+
 
     function createMovieCard(movie) {
         var movieCard = document.createElement("div");
@@ -209,24 +236,29 @@
         checkButton.innerHTML = "-";
         checkButton.className = "check-button";
         checkButton.addEventListener("click", function() {
-            var email = JSON.parse(sessionStorage.getItem('user'));
+            checkButton.innerHTML = "✓";
             var movie = movieTitle.textContent;
+            var user = JSON.parse(sessionStorage.getItem('user'));
+            var email = user.email;
+            var url = 'https://readily-dynamic-salmon.ngrok-free.app/users/' + encodeURIComponent(email) + '/remove-favourite-movie/' + encodeURIComponent(movie);
 
-            fetch('/remove-favorite-movie', {
+            fetch(url, {
                 method: 'PUT',
                 headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Content-Type': 'application/json',
                 },
-                body: new URLSearchParams({
-                    'movie': movie,
-                    'email': email
+            })
+                    .then(response => {
+                    if (response.ok) {
+                        movieCard.parentNode.removeChild(movieCard);
+                    }
                 })
-            }).then(response => {
-                if (response.ok) {
-                    movieCard.parentNode.removeChild(movieCard);
-                }
-            });
+                .then(data => console.log(data))
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
         });
+
         movieCard.appendChild(movieImageContainer);
         movieCard.appendChild(movieTextContainer);
         movieCard.appendChild(checkButton);

@@ -135,25 +135,25 @@
             errorContainer.textContent = 'All fields must be filled out';
             return;
         }
-        fetch('/login?email=' + encodeURIComponent(email.value) + '&password=' + encodeURIComponent(password.value), {
-            method: 'GET',
-        })
-            .then(response => {
-                if (response.status === 401) {
-                    throw new Error('Invalid email or password');
-                }
-                if (!response.ok) {
-                    throw new Error('Server error: ' + response.status);
-                }
-                return response.json();
-            })
-            .then(data => {
-                sessionStorage.setItem('user', JSON.stringify(email.value));
+        // var url = 'http://localhost:8080/users/sign-in?callback=handleResponse&email=' + encodeURIComponent(email.value) + '&password=' + encodeURIComponent(password.value);
+        var url = 'https://readily-dynamic-salmon.ngrok-free.app/users/sign-in?callback=handleResponse&email=' + encodeURIComponent(email.value) + '&password=' + encodeURIComponent(password.value);
+        var script = document.createElement('script');
+        script.src = url;
+        document.head.appendChild(script);
+
+        window.handleResponse = function(data) {
+            if (data && data.message === "Invalid email or password") {
+                errorContainer.textContent = 'Invalid email or password';
+            } else if (data && data.email) {
+                sessionStorage.setItem('user', JSON.stringify(data));
                 window.location.href = '/mainLoged';
-            })
-            .catch((error) => {
-                errorContainer.textContent = error.message;
-            });
+            } else {
+                errorContainer.textContent = 'Unexpected error';
+            }
+        }
     }
+
+
+
 </script>
 </html>

@@ -20,4 +20,3 @@ public interface MovieRepository extends CrudRepository<Movie, Long> {
 
     Page<Movie> findByGenreContainingIgnoreCaseAndReleaseYearContaining(String genre, String releaseYear, Pageable pageable);
 }
-

@@ -182,34 +182,29 @@
         }
     }
 
-    function redirectToSignIn(event) {
+    function redirectToSignIn() {
         window.location.href = '/sign-in';
     }
 
-    function redirectToSignUp(event) {
+    function redirectToSignUp() {
         window.location.href = '/sign-up';
     }
 
-    function searchMovies() {
-        var query = document.getElementById("searchQuery").value;
-        fetch('/search?title=' + query, {
-            method: 'GET',
-        })
-            .then(response => {
-                if (response.status === 204) {
-                    var searchResult = document.getElementById("searchResult");
-                    searchResult.innerText = "<p style='font-size: 1.5em; text-align: center;'>Movies haven't found</p>";
-                } else {
-                    return response.json();
-                }
-        })
-            .then(data => {
-                var searchResult = document.getElementById("searchResult");
-                searchResult.innerHTML = "";
-                var exactMatchFound = false;
-                var addedMovieTitles = new Set();
-                data.content.forEach(movie => {
-                    if (movie.title.toLowerCase() === query.toLowerCase() && !addedMovieTitles.has(movie.title)) {
+    function redirectToAllMovies() {
+        window.location.href = '/all-movies';
+    }
+
+    var query = "";
+
+    window.handleResponse = function(data) {
+        try {
+            var searchResult = document.getElementById("searchResult");
+            searchResult.innerHTML = "";
+            var exactMatchFound = false;
+            var addedMovieTitles = new Set();
+            if (data && Array.isArray(data)) {
+                data.forEach(movie => {
+                    if (movie.title.localeCompare(query, undefined, {sensitivity: 'base'}) === 0 && !addedMovieTitles.has(movie.title)) {
                         var movieCard = createMovieCard(movie);
                         searchResult.appendChild(movieCard);
                         exactMatchFound = true;
@@ -217,7 +212,7 @@
                     }
                 });
                 if (!exactMatchFound) {
-                    data.content.forEach(movie => {
+                    data.forEach(movie => {
                         if (movie.title.toLowerCase().includes(query.toLowerCase()) && !addedMovieTitles.has(movie.title)) {
                             var movieCard = createMovieCard(movie);
                             searchResult.appendChild(movieCard);
@@ -225,16 +220,23 @@
                         }
                     });
                 }
-                if (searchResult.innerHTML === "") {
-                    searchResult.innerHTML = "<p style='font-size: 1.5em; text-align: center;'>No movies found</p>";
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                var searchResult = document.getElementById("searchResult");
-                searchResult.status(200).send("<p style='font-size: 1.5em; text-align: center;'>Error occurred while fetching movies</p>");
-            });
+            }
+            if (searchResult.innerHTML === "") {
+                searchResult.innerHTML = "<p style='font-size: 1.5em; text-align: center;'>No movies found</p>";
+            }
+        } catch (error) {
+            console.error("An error occurred while handling the response: ", error);
+        }
     }
+
+    function searchMovies() {
+        query = document.getElementById("searchQuery").value;
+        var script = document.createElement('script');
+        script.src = 'https://readily-dynamic-salmon.ngrok-free.app/movies/search?title=' + query + '&callback=handleResponse';
+        document.head.appendChild(script);
+    }
+
+
 
     function createMovieCard(movie) {
         var movieCard = document.createElement("div");
@@ -284,10 +286,6 @@
         movieCard.appendChild(checkButton);
 
         return movieCard;
-    }
-
-    function redirectToAllMovies() {
-        window.location.href = '/all-movies';
     }
 </script>
 </body>
