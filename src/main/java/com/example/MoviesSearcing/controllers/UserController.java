@@ -2,14 +2,18 @@ package com.example.MoviesSearcing.controllers;
 
 import com.example.MoviesSearcing.models.User;
 import com.example.MoviesSearcing.services.UserService;
+import com.google.gson.Gson;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+
 import org.springframework.web.bind.annotation.CrossOrigin;
 
 
@@ -24,71 +28,47 @@ public class UserController {
     }
 
     @PostMapping("/sign-up")
-    public ResponseEntity<User> signUp(@RequestBody User user) {
-        if (user.getEmail() == null || user.getPassword() == null || user.getUsername() == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
-        if (userService.findByEmail(user.getEmail()) != null) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
-        }
-        User savedUser = userService.saveUser(user);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
-    }
-
-    @PostMapping("/sign-in")
-    public ResponseEntity<?> signIn(@RequestBody User user) {
-        if (user.getEmail() == null || user.getPassword() == null) {
+    public ResponseEntity<?> signUp(@RequestBody User user) {
+        if (user.getUsername() == null || user.getEmail() == null  || user.getPassword() == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
         User existingUser = userService.findByEmail(user.getEmail());
-        if (existingUser != null && existingUser.getPassword().equals(user.getPassword())) {
-            return ResponseEntity.ok(existingUser);
+        if (existingUser != null) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("User already exists");
         }
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid email or password");
+        User newUser = userService.saveUser(user);
+        return ResponseEntity.ok(newUser);
     }
 
-    @GetMapping("")
-    public ResponseEntity<List<User>> getAllUsers(Pageable pageable) {
-        Page<User> userPage = userService.getAllUsers(pageable);
-        return ResponseEntity.ok(userPage.getContent());
-    }
-
-    @PostMapping("")
-    public ResponseEntity<User> addUser(@RequestBody User user) {
-        if (user.getEmail() == null || user.getPassword() == null || user.getUsername() == null) {
+    @GetMapping("/sign-in")
+    public ResponseEntity<?> signIn(@RequestParam String email, @RequestParam String password, @RequestParam(required = false) String callback) {
+        if (email == null || password == null){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
-        if (userService.findByEmail(user.getEmail()) != null) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        User existingUser = userService.findByEmail(email);
+        if (existingUser != null && existingUser.getPassword().equals(password)) {
+            String json = new Gson().toJson(existingUser);
+            return ResponseEntity.ok().contentType(new MediaType("application", "javascript")).body(callback + "(" + json + ");");
         }
-        User savedUser = userService.saveUser(user);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
-    }
-
-    @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody User user, Pageable pageable) {
-        if (user.getEmail() != null && user.getPassword() != null) {
-            User existingUser = userService.findByEmail(user.getEmail());
-            if (existingUser != null && existingUser.getPassword().equals(user.getPassword())) {
-                Page<User> userPage = userService.getAllUsers(pageable);
-                return ResponseEntity.ok(userPage.getContent());
-            }
-        }
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid email or password");
+        String json = new Gson().toJson("Invalid email or password");
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).contentType(new MediaType("application", "javascript")).body(callback + "(" + json + ");");
     }
 
     @GetMapping("/{email}/favourite-movies")
-    public ResponseEntity<List<String>> getFavoriteMovies(@PathVariable String email) {
+    public String getFavoriteMovies(@PathVariable String email, @RequestParam(name = "callback", required = true) String callback) {
         User user = userService.findByEmail(email);
         String favouriteMoviesString = user.getFavouriteMovies();
+        List<String> favouriteMovies;
         if (favouriteMoviesString != null) {
-            return ResponseEntity.ok(Arrays.asList(favouriteMoviesString.split(",")));
+            favouriteMovies = Arrays.asList(favouriteMoviesString.split(","));
         } else {
-            return ResponseEntity.ok(new ArrayList<>());
+            favouriteMovies = new ArrayList<>();
         }
+        String json = new Gson().toJson(favouriteMovies);
+        return callback + "(" + json + ");";
     }
 
-    @PostMapping("/{email}/favourite-movies")
+    @PostMapping("/{email}/add-favourite-movie")
     public ResponseEntity<User> addFavoriteMovie(@RequestBody String movie, @PathVariable String email) {
         User user = userService.findByEmail(email);
         if (user == null || movie == null || movie.isEmpty()) {
@@ -108,8 +88,8 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(savedUser);
     }
 
-    @PutMapping("/{email}/favourite-movies")
-    public ResponseEntity<User> removeFavoriteMovie(@RequestBody String movie, @PathVariable String email) {
+    @PutMapping("/{email}/remove-favourite-movie/{movie}")
+    public ResponseEntity<User> removeFavoriteMovie(@PathVariable String movie, @PathVariable String email) {
         User user = userService.findByEmail(email);
         if (user == null || movie == null || movie.isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();

@@ -2,6 +2,7 @@ package com.example.MoviesSearcing.controllers;
 
 import com.example.MoviesSearcing.services.MovieService;
 import com.example.MoviesSearcing.models.Movie;
+import com.google.gson.Gson;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -22,16 +23,12 @@ public class MovieController {
         this.movieService = movieService;
     }
 
-    @GetMapping("")
-    public ResponseEntity<List<Movie>> getAllMovies(Pageable pageable) {
-        Page<Movie> moviePage = movieService.getAllMovies(pageable);
-        return ResponseEntity.ok(moviePage.getContent());
-    }
     @GetMapping("/filter")
-    public ResponseEntity<List<Movie>> filterMovies(
+    public String filterMovies(
             @RequestParam(name = "genre", required = false) String genre,
             @RequestParam(name = "year", required = false) String year,
             @RequestParam(name = "sort", required = false) String sort,
+            @RequestParam(name = "callback", required = true) String callback,
             Pageable pageable) {
         if (sort != null) {
             if (sort.equals("rating_asc")) {
@@ -50,12 +47,14 @@ public class MovieController {
         } else {
             resultPage = movieService.getAllMovies(pageable);
         }
-        return ResponseEntity.ok(resultPage.getContent());
+        String json = new Gson().toJson(resultPage.getContent());
+        return callback + "(" + json + ");";
     }
 
     @GetMapping("/search")
-    public ResponseEntity<Page<Movie>> searchMovies(
+    public String searchMovies(
             @RequestParam(name = "title", required = true) String title,
+            @RequestParam(name = "callback", required = true) String callback,
             Pageable pageable) {
         Page<Movie> resultPage;
 
@@ -65,6 +64,7 @@ public class MovieController {
         } else {
             resultPage = movieService.findByTitle(title, pageable);
         }
-        return resultPage.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(resultPage);
+        String json = new Gson().toJson(resultPage.getContent());
+        return callback + "(" + json + ");";
     }
 }
