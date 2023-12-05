@@ -1,21 +1,20 @@
 package com.example.MoviesSearcing.controllers;
 
-import com.example.MoviesSearcing.models.User;
 import com.example.MoviesSearcing.services.MovieService;
 import com.example.MoviesSearcing.models.Movie;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 
-@Controller
+@CrossOrigin(origins = "*", allowedHeaders = "*")
+@RestController
+@RequestMapping("/movies")
 public class MovieController {
     private final MovieService movieService;
 
@@ -23,28 +22,13 @@ public class MovieController {
         this.movieService = movieService;
     }
 
-    @GetMapping("/")
-    public String main() {
-        return "main";
-    }
-
-    @GetMapping("/all-movies")
-    public String getAllMovies(Model model, Pageable pageable) {
+    @GetMapping("")
+    public ResponseEntity<List<Movie>> getAllMovies(Pageable pageable) {
         Page<Movie> moviePage = movieService.getAllMovies(pageable);
-        model.addAttribute("movies", moviePage.getContent());
-        return "all-movies";
+        return ResponseEntity.ok(moviePage.getContent());
     }
-
-    @GetMapping("/all-movies-json")
-    @ResponseBody
-    public List<Movie> getAllMoviesJson(Pageable pageable) {
-        Page<Movie> moviePage = movieService.getAllMovies(pageable);
-        return moviePage.getContent();
-    }
-
-    @GetMapping("/all-movies-filter-json")
-    @ResponseBody
-    public List<Movie> filterMoviesJson(
+    @GetMapping("/filter")
+    public ResponseEntity<List<Movie>> filterMovies(
             @RequestParam(name = "genre", required = false) String genre,
             @RequestParam(name = "year", required = false) String year,
             @RequestParam(name = "sort", required = false) String sort,
@@ -66,39 +50,10 @@ public class MovieController {
         } else {
             resultPage = movieService.getAllMovies(pageable);
         }
-        return resultPage.getContent();
-    }
-
-    @GetMapping("/all-movies-filter")
-    public String filterMoviesPage(
-            @RequestParam(name = "genre", required = false) String genre,
-            @RequestParam(name = "year", required = false) String year,
-            @RequestParam(name = "sort", required = false) String sort,
-            Pageable pageable,
-            Model model) {
-        if (sort != null) {
-            if (sort.equals("rating_asc")) {
-                pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by("rating").ascending());
-            } else if (sort.equals("rating_ desc")) {
-                pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by("rating").descending());
-            }
-        }
-        Page<Movie> resultPage;
-        if (genre != null && year != null) {
-            resultPage = movieService.findByGenreAndReleaseYear(genre, year, pageable);
-        } else if (genre != null) {
-            resultPage = movieService.findByGenre(genre, pageable);
-        } else if (year != null) {
-            resultPage = movieService.findByReleaseYear(year, pageable);
-        } else {
-            resultPage = movieService.getAllMovies(pageable);
-        }
-        model.addAttribute("movies", resultPage.getContent());
-        return "all-movies";
+        return ResponseEntity.ok(resultPage.getContent());
     }
 
     @GetMapping("/search")
-    @ResponseBody
     public ResponseEntity<Page<Movie>> searchMovies(
             @RequestParam(name = "title", required = true) String title,
             Pageable pageable) {
@@ -113,5 +68,3 @@ public class MovieController {
         return resultPage.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(resultPage);
     }
 }
-
-
