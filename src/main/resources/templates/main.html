@@ -109,18 +109,6 @@
             margin :10px;
         }
 
-        .try {
-            padding :10px 20px;
-            background-color :#007BFF;
-            color :white;
-            border :none;
-            left: 300px;
-            border-radius :5px;
-            cursor :pointer;
-            font-size :20px;
-            margin :10px;
-        }
-
         .sign-in-button {
             position: absolute;
             top: 30px;
@@ -178,7 +166,6 @@
 
 <h1>Movie Search</h1>
 <button class="all-movies-button" onclick="redirectToAllMovies()">All Movies</button>
-<button class="try" onclick="loadJsonFromUrl()">try get json file</button>
 <button class="sign-in-button" onclick="redirectToSignIn()">Sign In</button>
 <button class="sign-up-button" onclick="redirectToSignUp()">Sign Up</button>
 <div class="search-form">
@@ -188,28 +175,7 @@
 </div>
 <div class="movies-list" id="searchResult"></div>
 
-<h2>JSON Data:</h2>
-<pre id="jsonData"></pre>
 <script>
-
-    function loadJsonFromUrl() {
-        // const url = 'https://readily-dynamic-salmon.ngrok-free.app/movies';
-        const url = 'https://localhost:8080/movies';
-
-        fetch(url, {
-            headers: new Headers({
-                "ngrok-skip-browser-warning": "8080",
-            }),
-        })
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('jsonData').textContent = JSON.stringify(data, null, 2);
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-    }
-
     function handleKeyPress(event) {
         if (event.key === 'Enter') {
             searchMovies();
@@ -226,7 +192,7 @@
 
     function searchMovies() {
         var query = document.getElementById("searchQuery").value;
-        fetch('/movies/search?title=' + query, {
+        fetch('/search?title=' + query, {
             method: 'GET',
         })
             .then(response => {
