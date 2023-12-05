@@ -216,8 +216,7 @@
         var genre = document.getElementById('genreInput').value;
         var year = document.getElementById('yearInput').value;
         // var url = 'http://localhost:8080/all-movies-filter-json?';
-        var url = '/all-movies-filter-json?';
-        // var url = 'https://readily-dynamic-salmon.ngrok-free.app/all-movies-filter-json?';
+        var url = 'https://readily-dynamic-salmon.ngrok-free.app/all-movies-filter-json?';
         if(genre) {
             url += 'genre=' + genre;
         }
@@ -300,8 +299,7 @@
     function loadMovies() {
         if (inProgress) return;
         inProgress = true;
-        // var url = '/all-movies-filter-json?page=' + page++;
-        var url = '/all-movies-filter-json?' + page++;
+        var url = '/all-movies-filter-json?page=' + page++;
         var genre = document.getElementById('genreInput').value;
         var year = document.getElementById('yearInput').value;
         if(genre) {
