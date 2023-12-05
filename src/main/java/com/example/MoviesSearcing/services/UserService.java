@@ -31,12 +31,4 @@ public class UserService {
     public User findByEmail(String email) {
         return userRepository.findByEmail(email);
     }
-
-//    public User getFavouritesMovies(String email) {
-//        return userRepository.findByEmail(email);
-//    }
-
-//    public User saveFavouriteMovie(String email, String title) {
-//        return userRepository.updateUserByEmail(email, title);
-//    }
 }

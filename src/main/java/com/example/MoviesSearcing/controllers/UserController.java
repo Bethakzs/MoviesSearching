@@ -24,15 +24,16 @@ public class UserController {
     }
 
     @PostMapping("/sign-up")
-    public ResponseEntity<User> signUp(@RequestBody User user) {
-        if (user.getEmail() == null || user.getPassword() == null || user.getUsername() == null) {
+    public ResponseEntity<?> signUp(@RequestBody User user) {
+        if (user.getUsername() == null || user.getEmail() == null || user.getPassword() == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
-        if (userService.findByEmail(user.getEmail()) != null) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        User existingUser = userService.findByEmail(user.getEmail());
+        if (existingUser != null) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("User already exists");
         }
-        User savedUser = userService.saveUser(user);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
+        User newUser = userService.saveUser(user);
+        return ResponseEntity.ok(newUser);
     }
 
     @PostMapping("/sign-in")
