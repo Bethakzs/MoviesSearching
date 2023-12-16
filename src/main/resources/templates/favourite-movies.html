@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Favourite Movies</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css?family=Poppins:400,500,600,700&display=swap');
+        *{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        .movies-list {
+            margin-top: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+
+        .check-button {
+            position: absolute;
+            right: 10px;
+            bottom: 10px;
+            width: 50px;
+            height: 50px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 20px;
+            text-align: center;
+            line-height: 30px;
+        }
+
+        .movie-card {
+            margin-bottom: 80px;
+            margin-right: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            display: flex;
+            width: calc(50% - 80px);
+            height: auto;
+            overflow-wrap: break-word;
+            font-size: 1.2em;
+            line-height: 2em;
+        }
+
+        .movie-image-container {
+            width :260px;
+            height :500px;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            background-color:#ddd;
+            padding-left :65px;
+        }
+
+        .movie-text-container {
+            width :calc(100% - 260px);
+            padding-left :110px;
+            display:flex;
+            flex-direction :column;
+        }
+
+        .movie-image {
+            width :180%;
+            height :100%;
+        }
+
+        .movie-card p {
+            margin: 4px 0;
+        }
+
+        .bold {
+            font-weight: bold;
+        }
+
+        .return-button {
+            position: absolute;
+            left: 520px;
+            top: 10px;
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 20px;
+            margin: 10px;
+        }
+
+        button:hover{
+            background: #0e4bf1;
+        }
+    </style>
+</head>
+<body>
+<button class="return-button" onclick="returnToMainPage()">Return to Main Page</button>
+
+<h1>Favourite Movies</h1>
+
+<div id="searchResult" class="movies-list"></div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    function returnToMainPage() {
+        window.history.back();
+    }
+
+    var page = 0;
+    var inProgress = false;
+    var addedMovieIds = new Set();
+
+    function loadMovies() {
+        if (inProgress) return;
+        inProgress = true;
+        var user = JSON.parse(sessionStorage.getItem('user'));
+        var email = user.email;
+        var url = 'https://readily-dynamic-salmon.ngrok-free.app/users/' + encodeURIComponent(email) + '/favourite-movies?page=' + page + '&callback=handleMovieTitlesResponse';
+        var script = document.createElement('script');
+        script.src = url;
+        document.head.appendChild(script);
+        page++;
+    }
+
+    window.handleMovieTitlesResponse = function(movieTitles) {
+        var promises = movieTitles.map(movieTitle => {
+            movieTitle = movieTitle.trim();
+            if (!addedMovieIds.has(movieTitle)) {
+                addedMovieIds.add(movieTitle); // Add the movie title to the set of added movies
+                var url = 'https://readily-dynamic-salmon.ngrok-free.app/movies/search?title=' + encodeURIComponent(movieTitle) + '&callback=handleResponse ';
+                var script = document.createElement('script');
+                script.src = url;
+                document.head.appendChild(script);
+            }
+        });
+        Promise.all(promises).then(() => {
+            inProgress = false;
+        });
+    }
+
+    window.handleResponse = function(data) {
+        try {
+            var searchResult = document.getElementById("searchResult");
+            var exactMatchFound = false;
+            var addedMovieTitles = new Set();
+            if (data && Array.isArray(data)) {
+                data.forEach(movie => {
+                    var query = movie.title;
+                    if (movie.title.localeCompare(query, undefined, {sensitivity: 'base'}) === 0 && !addedMovieTitles.has(movie.title)) {
+                        var movieCard = createMovieCard(movie);
+                        searchResult.appendChild(movieCard);
+                        exactMatchFound = true;
+                        addedMovieTitles.add(movie.title);
+                    }
+                });
+                if (!exactMatchFound) {
+                    data.forEach(movie => {
+                        var query = movie.title;
+                        if (movie.title.toLowerCase().includes(query.toLowerCase()) && !addedMovieTitles.has(movie.title)) {
+                            var movieCard = createMovieCard(movie);
+                            searchResult.appendChild(movieCard);
+                            addedMovieTitles.add(movie.title);
+                        }
+                    });
+                }
+            }
+            if (searchResult.innerHTML === "") {
+                searchResult.innerHTML = "<p style='font-size: 1.5em; text-align: center;'>No movies found</p>";
+            }
+        } catch (error) {
+            console.error("An error occurred while handling the response: ", error);
+        }
+    }
+
+    $(window).scroll(function() {
+        if($(window).scrollTop() + $(window).height() > $(document).height() - 100) {
+            loadMovies();
+        }
+    });
+
+    $(document).ready(function() {
+        loadMovies();
+    });
+
+
+    function createMovieCard(movie) {
+        var movieCard = document.createElement("div");
+        movieCard.className = "movie-card";
+        movieCard.style.position = "relative";
+
+        var movieImageContainer = document.createElement("div");
+        movieImageContainer.className = "movie-image-container";
+
+        var movieImage = document.createElement("img");
+        movieImage.src = movie.poster;
+        movieImage.className = "movie-image";
+
+        movieImageContainer.appendChild(movieImage);
+
+        var movieTextContainer = document.createElement("div");
+        movieTextContainer.className = "movie-text-container";
+
+        var movieTitle = document.createElement("h2");
+        movieTitle.textContent = movie.title;
+        movieTextContainer.appendChild(movieTitle);
+
+        var movieGenre = document.createElement("p");
+        movieGenre.innerHTML = "<span class='bold'>Genre:</span> " + movie.genre;
+        movieTextContainer.appendChild(movieGenre);
+
+        var movieRating = document.createElement("p");
+        movieRating.innerHTML = "<span class='bold'>Rating:</span> " + movie.rating;
+        movieTextContainer.appendChild(movieRating);
+
+        var movieYear = document.createElement("p");
+        movieYear.innerHTML = "<span class='bold'>Data of release:</span> " + movie.releaseYear;
+        movieTextContainer.appendChild(movieYear);
+
+        var movieDescription = document.createElement("p");
+        movieDescription.innerHTML = "<span class='bold'>Description:</span> " + movie.description;
+        movieTextContainer.appendChild(movieDescription);
+
+        var checkButton = document.createElement("button");
+        checkButton.innerHTML = "-";
+        checkButton.className = "check-button";
+        checkButton.addEventListener("click", function() {
+            checkButton.innerHTML = "✓";
+            var movie = movieTitle.textContent;
+            var user = JSON.parse(sessionStorage.getItem('user'));
+            var email = user.email;
+            var url = 'https://readily-dynamic-salmon.ngrok-free.app/users/' + encodeURIComponent(email) + '/remove-favourite-movie/' + encodeURIComponent(movie);
+
+            fetch(url, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+                .then(response => {
+                    if (response.ok) {
+                        movieCard.parentNode.removeChild(movieCard);
+                    }
+                })
+                .then(data => console.log(data))
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+        });
+
+        movieCard.appendChild(movieImageContainer);
+        movieCard.appendChild(movieTextContainer);
+        movieCard.appendChild(checkButton);
+
+        return movieCard;
+    }
+</script>
+</body>
+</html>
