@@ -154,7 +154,7 @@
             return;
         }
 
-        fetch('https://readily-dynamic-salmon.ngrok-free.app/users/sign-up', {
+        fetch('http://26.185.15.150:8080/users/sign-up', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -162,22 +162,21 @@
             body: JSON.stringify({username: username.value, email: email.value, password: password.value})
         })
             .then(response => {
-                if (response.status === 200) {
-                    window.location.href = '/mainLoged';
-                }
                 if (response.status === 409) {
                     throw new Error('Email already exists');
+                }
+                if (!response.ok) {
+                    throw new Error('Server error: ' + response.status);
                 }
                 return response.json();
             })
             .then(data => {
-                if (data && data.message) {
-                    errorContainer.textContent = 'Error: ' + data.message;
-                }
+                window.location.href = '/mainLoged';
             })
             .catch((error) => {
                 errorContainer.textContent = error.message;
             });
     }
+
 </script>
 </html>

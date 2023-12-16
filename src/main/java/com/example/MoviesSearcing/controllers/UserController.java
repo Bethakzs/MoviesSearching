@@ -47,36 +47,6 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid email or password");
     }
 
-    @GetMapping("")
-    public ResponseEntity<List<User>> getAllUsers(Pageable pageable) {
-        Page<User> userPage = userService.getAllUsers(pageable);
-        return ResponseEntity.ok(userPage.getContent());
-    }
-
-    @PostMapping("")
-    public ResponseEntity<User> addUser(@RequestBody User user) {
-        if (user.getEmail() == null || user.getPassword() == null || user.getUsername() == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
-        if (userService.findByEmail(user.getEmail()) != null) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
-        }
-        User savedUser = userService.saveUser(user);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
-    }
-
-    @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody User user, Pageable pageable) {
-        if (user.getEmail() != null && user.getPassword() != null) {
-            User existingUser = userService.findByEmail(user.getEmail());
-            if (existingUser != null && existingUser.getPassword().equals(user.getPassword())) {
-                Page<User> userPage = userService.getAllUsers(pageable);
-                return ResponseEntity.ok(userPage.getContent());
-            }
-        }
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid email or password");
-    }
-
     @GetMapping("/{email}/favourite-movies")
     public ResponseEntity<List<String>> getFavoriteMovies(@PathVariable String email) {
         User user = userService.findByEmail(email);

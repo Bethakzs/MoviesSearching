@@ -27,6 +27,7 @@ public class MovieController {
         Page<Movie> moviePage = movieService.getAllMovies(pageable);
         return ResponseEntity.ok(moviePage.getContent());
     }
+
     @GetMapping("/filter")
     public ResponseEntity<List<Movie>> filterMovies(
             @RequestParam(name = "genre", required = false) String genre,

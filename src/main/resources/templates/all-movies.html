@@ -215,7 +215,7 @@
     function applyFilters() {
         var genre = document.getElementById('genreInput').value;
         var year = document.getElementById('yearInput').value;
-        var url = 'https://readily-dynamic-salmon.ngrok-free.app/movies/filter?callback=handleResponse';
+        var url = 'http://26.185.15.150:8080/movies/filter?';
         if(genre) {
             url += '&genre=' + encodeURIComponent(genre);
         }
@@ -227,9 +227,11 @@
         } else if(sortRating === 2) {
             url += '&sort=rating_desc';
         }
-        var script = document.createElement('script');
-        script.src = url;
-        document.head.appendChild(script);
+        url += '&page=' + page;
+        fetch(url)
+            .then(response => response.json())
+            .then(data => handleResponse(data))
+            .catch(error => console.error('Error:', error));
     }
 
     window.handleResponse = function(data) {
@@ -284,16 +286,18 @@
             }
         });
     }
-
     var page = 0;
     var inProgress = false;
     var addedMovieIds = new Set();
 
     function loadMovies() {
-        var url = 'https://readily-dynamic-salmon.ngrok-free.app/movies/filter?callback=handleResponse';
-        var script = document.createElement('script');
-        script.src = url;
-        document.head.appendChild(script);
+        if (inProgress) return;
+        inProgress = true;
+        var url = 'http://26.185.15.150:8080/movies/filter?page=' + page;
+        fetch(url)
+            .then(response => response.json())
+            .then(data => handleResponse(data))
+            .catch(error => console.error('Error:', error));
     }
 
     function handleResponse(data) {
@@ -306,8 +310,8 @@
             }
         });
         inProgress = false;
+        page++;
     }
-
 
     $(window).scroll(function() {
         if($(window).scrollTop() + $(window).height() > $(document).height() - 100) {
@@ -318,6 +322,7 @@
     $(document).ready(function() {
         loadMovies();
     });
+
 
     function createMovieCard(movie) {
         var movieCard = document.createElement("div");

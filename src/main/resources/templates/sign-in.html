@@ -135,22 +135,33 @@
             errorContainer.textContent = 'All fields must be filled out';
             return;
         }
-        // var url = 'http://localhost:8080/users/sign-in?callback=handleResponse&email=' + encodeURIComponent(email.value) + '&password=' + encodeURIComponent(password.value);
-        var url = 'https://readily-dynamic-salmon.ngrok-free.app/users/sign-in?callback=handleResponse&email=' + encodeURIComponent(email.value) + '&password=' + encodeURIComponent(password.value);
-        var script = document.createElement('script');
-        script.src = url;
-        document.head.appendChild(script);
-
-        window.handleResponse = function(data) {
-            if (data && data.message === "Invalid email or password") {
-                errorContainer.textContent = 'Invalid email or password';
-            } else if (data && data.email) {
-                sessionStorage.setItem('user', JSON.stringify(data));
+        fetch('http://26.185.15.150:8080/users/sign-in', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                email: email.value,
+                password: password.value
+            })
+        })
+            .then(response => {
+                if (response.status === 401) {
+                    throw new Error('Invalid email or password');
+                }
+                if (!response.ok) {
+                    throw new Error('Server error: ' + response.status);
+                }
+                return response.json();
+            })
+            .then(data => {
+                sessionStorage.setItem('user', JSON.stringify(email.value));
                 window.location.href = '/mainLoged';
-            } else {
-                errorContainer.textContent = 'Unexpected error';
-            }
-        }
+            })
+            .catch((error) => {
+                errorContainer.textContent = error.message;
+            });
     }
+
 </script>
 </html>
