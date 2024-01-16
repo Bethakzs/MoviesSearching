@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.server.ResponseStatusException;
 
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
@@ -36,17 +37,13 @@ public class UserController {
     }
 
     @PostMapping("/sign-in")
-    public ResponseEntity<?> signIn(@RequestBody User user) {
-        if (user.getEmail() == null || user.getPassword() == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+    public ResponseEntity<User> signIn(@RequestBody User user) {
+        if(userService.loginUser(user)) {
+            return ResponseEntity.ok(user);
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        User existingUser = userService.findByEmail(user.getEmail());
-        if (existingUser != null && existingUser.getPassword().equals(user.getPassword())) {
-            return ResponseEntity.ok(existingUser);
-        }
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid email or password");
     }
-
     @GetMapping("/{email}/favourite-movies")
     public ResponseEntity<List<String>> getFavoriteMovies(@PathVariable String email) {
         User user = userService.findByEmail(email);

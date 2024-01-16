@@ -1,18 +1,21 @@
 package com.example.MoviesSearcing.models;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+        import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.domain.Page;
 
 import java.util.Collection;
 import java.util.Collections;
 
-@Entity
+@Getter
+@Setter
+@Entity 
+@Table(name = "user")
 public class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="USERID_SEQ")
+    @SequenceGenerator(name="USERID_SEQ", sequenceName="USERID_SEQ", allocationSize=1)
     private Long id;
     private String username;
     private String email;
@@ -30,43 +33,4 @@ public class User {
     public User() {
 
     }
-    public String getFavouriteMovies() {
-        return favouriteMovies;
-    }
-
-    public void setFavouriteMovies(String favouriteMovies) {
-        this.favouriteMovies = favouriteMovies;
-    }
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
 }

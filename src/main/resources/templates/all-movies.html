@@ -200,6 +200,7 @@
 </div>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
+
     function returnToMainPage() {
         window.history.back();
     }
@@ -217,36 +218,40 @@
         var year = document.getElementById('yearInput').value;
         var url = 'http://26.185.15.150:8080/movies/filter?';
         if(genre) {
-            url += '&genre=' + encodeURIComponent(genre);
+            url += 'genre=' + genre;
         }
         if(year) {
-            url += '&year=' + encodeURIComponent(year);
+            if(genre) {
+                url += '&';
+            }
+            url += 'year=' + year;
         }
         if(sortRating === 1) {
-            url += '&sort=rating_asc';
+            if(genre || year) {
+                url += '&';
+            }
+            url += 'sort=rating_asc';
         } else if(sortRating === 2) {
-            url += '&sort=rating_desc';
+            if(genre || year) {
+                url += '&';
+            }
+            url += 'sort=rating_desc';
         }
-        url += '&page=' + page;
         fetch(url)
             .then(response => response.json())
-            .then(data => handleResponse(data))
-            .catch(error => console.error('Error:', error));
-    }
-
-    window.handleResponse = function(data) {
-        var searchResult = document.getElementById("searchResult");
-        while (searchResult.firstChild) {
-            searchResult.removeChild(searchResult.firstChild);
-        }
-        data.forEach(movie => {
-            var movieCard = createMovieCard(movie);
-            searchResult.appendChild(movieCard);
-        });
+            .then(data => {
+                var searchResult = document.getElementById("searchResult");
+                while (searchResult.firstChild) {
+                    searchResult.removeChild(searchResult.firstChild);
+                }
+                data.forEach(movie => {
+                    var movieCard = createMovieCard(movie);
+                    searchResult.appendChild(movieCard);
+                });
+            });
         var modal = document.getElementById("filtersModal");
         modal.style.display = "none";
     }
-
 
     function clearFilters() {
         document.getElementById('genreInput').value = '';
@@ -286,6 +291,7 @@
             }
         });
     }
+
     var page = 0;
     var inProgress = false;
     var addedMovieIds = new Set();
@@ -293,25 +299,29 @@
     function loadMovies() {
         if (inProgress) return;
         inProgress = true;
-        var url = 'http://26.185.15.150:8080/movies/filter?page=' + page;
-        fetch(url)
+        var email = JSON.parse(sessionStorage.getItem('user'));
+        var url = 'http://26.185.15.150:8080/movies?page=' + page;
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ email: email })
+        })
             .then(response => response.json())
-            .then(data => handleResponse(data))
-            .catch(error => console.error('Error:', error));
+            .then(data => {
+                var searchResult = document.getElementById("searchResult");
+                data.forEach(movie => {
+                    if (!addedMovieIds.has(movie.id)) {
+                        var movieCard = createMovieCard(movie);
+                        searchResult.appendChild(movieCard);
+                    }
+                });
+                page++;
+                inProgress = false;
+            });
     }
 
-    function handleResponse(data) {
-        var searchResult = document.getElementById("searchResult");
-        data.forEach(movie => {
-            if (!addedMovieIds.has(movie.id)) {
-                var movieCard = createMovieCard(movie);
-                searchResult.appendChild(movieCard);
-                addedMovieIds.add(movie.id);
-            }
-        });
-        inProgress = false;
-        page++;
-    }
 
     $(window).scroll(function() {
         if($(window).scrollTop() + $(window).height() > $(document).height() - 100) {
@@ -322,7 +332,6 @@
     $(document).ready(function() {
         loadMovies();
     });
-
 
     function createMovieCard(movie) {
         var movieCard = document.createElement("div");
@@ -347,6 +356,12 @@
         var movieReleaseDate = document.createElement("p");
         movieReleaseDate.innerHTML = "<span class='bold'>Data of release:</span> " + movie.releaseYear;
 
+        var movieRecommendation;
+        if(movie.recommended === true) {
+            movieRecommendation = document.createElement("p");
+            movieRecommendation.innerHTML = "<span class='bold'>Recommended for you</span>";
+        }
+
         [movieImage,
             movieTitle,
             movieGenre,
@@ -354,11 +369,9 @@
             movieReleaseDate,].forEach(element => {
             movieCard.appendChild(element);
         });
-
+        movieRecommendation && movieCard.appendChild(movieRecommendation);
         movieImageContainer.appendChild(movieImage);
-
         movieCard.insertBefore(movieImageContainer, movieTitle);
-
         return movieCard;
     }
 </script>

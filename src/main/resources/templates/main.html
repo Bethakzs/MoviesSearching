@@ -191,6 +191,7 @@
     }
 
     function redirectToAllMovies() {
+        sessionStorage.setItem('user', null);
         window.location.href = '/all-movies';
     }
 

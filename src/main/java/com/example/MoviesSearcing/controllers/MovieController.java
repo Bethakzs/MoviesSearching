@@ -1,14 +1,20 @@
 package com.example.MoviesSearcing.controllers;
 
+import com.example.MoviesSearcing.models.User;
 import com.example.MoviesSearcing.services.MovieService;
 import com.example.MoviesSearcing.models.Movie;
+import com.example.MoviesSearcing.services.UserService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 
@@ -17,15 +23,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 @RequestMapping("/movies")
 public class MovieController {
     private final MovieService movieService;
-
     public MovieController(MovieService movieService) {
         this.movieService = movieService;
-    }
-
-    @GetMapping("")
-    public ResponseEntity<List<Movie>> getAllMovies(Pageable pageable) {
-        Page<Movie> moviePage = movieService.getAllMovies(pageable);
-        return ResponseEntity.ok(moviePage.getContent());
     }
 
     @GetMapping("/filter")
@@ -59,7 +58,6 @@ public class MovieController {
             @RequestParam(name = "title", required = true) String title,
             Pageable pageable) {
         Page<Movie> resultPage;
-
         if (title.startsWith("partial:")) {
             String partialTitle = title.substring("partial:".length());
             resultPage = movieService.findByTitleIgnoreCaseContaining(partialTitle, pageable);
@@ -68,4 +66,18 @@ public class MovieController {
         }
         return resultPage.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(resultPage);
     }
+
+    @PostMapping("")
+    public ResponseEntity<List<Movie>> getMovies(@RequestBody User user, Pageable pageable) {
+        if(user.getEmail() == null || user.getEmail().isEmpty()) {
+            Page<Movie> movies = movieService.getAllMoviesRandom(PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()));
+            System.out.println("test1");
+            return ResponseEntity.ok(movies.getContent());
+        } else {
+            System.out.println("test2");
+            Page<Movie> movies = movieService.getAllMoviesWithFavourites(user.getEmail(), PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()));
+            return ResponseEntity.ok(movies.getContent());
+        }
+    }
+
 }
